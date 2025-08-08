@@ -1,0 +1,207 @@
+{% extends "master.html" %}
+
+{% block title %}
+Funções
+{% endblock %}
+
+{% block content %}
+
+<div id="divAdicionarFuncao" class="container">
+    <div class="row">
+        <div class="col-sm-8">
+            <label for="txtNomeFuncao">Nome</label>
+            <input type="text" placeholder="Coordenador de Tecnologia da Informação e Comunicação"
+                class="form-control upper" id="txtNomeFuncao">
+        </div>
+        <div class="col-sm-3">
+            <label for="txtSiglaFuncao">Tipo</label>
+            <input type="text" placeholder="FG-II" class="form-control upper" id="txtSiglaFuncao">
+        </div>
+        <div class="col-sm-1 item-centro">
+            <br>
+            <button type="button" class="btn btn-default mt-4 form-control" onclick="Inserir()">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <label>Listagem de Funções</label>
+    <div class="row">
+        <div class="col-sm-10 item-direita">
+            <input type="text" id="txtNomeFuncaoPesquisar" class="form-control w-100"
+                placeholder="Informe nome ou tipo de uma função">
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" onclick="location.reload()"><i class="fa fa-refresh"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-12">
+            <table class="table tabela-customizada" id="tabela_funcoes">
+                <thead>
+                    <tr align="left">
+                        <th>#</th>
+                        <th>Função</th>
+                        <th>Tipo</th>
+                        <th>Nº servidores</th>
+                        <th>Data cadastro</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </thead>
+                <tbody id="tabela_dados">
+                    {% for funcao in funcoes %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{ funcao.nome }}</td>
+                        <td>{{ funcao.sigla }}</td>
+                        <td>{{ funcao.num_servidores }}</td>
+                        <td>{{ funcao.data_cadastro|date:"d/m/Y H:i" }}</td>
+                        <td align="center">
+                            <button data-id="{{funcao.id}}" class="btn btn-default"
+                                onclick="abrir('modalEditarFuncao'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                            </button>
+
+                            <button data-id="{{funcao.id}}" class="btn btn-error"
+                                onclick="abrir('modalExcluirFuncao'); setarDataId('btnExcluir', this.dataset.id)">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalEditarFuncao" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Editar Função</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalEditarFuncao')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <label for="txtNomeFuncaoEditar">Nome da Função</label>
+        <input type="text" id="txtNomeFuncaoEditar" class="form-control">
+        <label for="txtSiglaFuncaoEditar">Tipo</label>
+        <input type="text" id="txtSiglaFuncaoEditar" class="form-control">
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarFuncao')">Cancelar</button>
+        <button class="btn btn-success" id="btnEditar" onclick="Editar(this.dataset.id)">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalEditarFuncaoBackdrop" class="modal-backdrop"></div>
+
+<div id="modalExcluirFuncao" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Excluir Funcao</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalExcluirFuncao')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <p>Deseja realmente excluir?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirFuncao')">Cancelar</button>
+        <button class="btn btn-error" id="btnExcluir" onclick="Excluir(this.dataset.id)"><i class="fa fa-trash"></i>
+            Confirmar</button>
+    </div>
+</div>
+<div id="modalExcluirFuncaoBackdrop" class="modal-backdrop"></div>
+
+<script>
+    async function Inserir() {
+
+        const nomeFuncao = obterElemento('txtNomeFuncao');
+        const siglaFuncao = obterElemento('txtSiglaFuncao');
+
+        const campos = [nomeFuncao, siglaFuncao];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('nome', nomeFuncao.value.toUpperCase())
+        formData.append('sigla', siglaFuncao.value.toUpperCase());
+
+        const resposta = await InserirDados('/funcoes/adicionar/', formData);
+    }
+    async function Obter(id_funcao) {
+        const resposta = await ObterDados(`/funcoes/obter/${id_funcao}/`);
+        if (resposta.dados) {
+            setarValor('txtNomeFuncaoEditar', resposta.dados.nome);
+            setarValor('txtSiglaFuncaoEditar', resposta.dados.sigla);
+        }
+    }
+    async function Editar(id_funcao) {
+
+        const nomeFuncao = obterElemento('txtNomeFuncaoEditar');
+        const siglaFuncao = obterElemento('txtSiglaFuncaoEditar');
+
+        const campos = [nomeFuncao, siglaFuncao];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('nome', nomeFuncao.value.toUpperCase());
+        formData.append('sigla', siglaFuncao.value.toUpperCase());
+
+        const resposta = await EditarDados(`/funcoes/editar/${id_funcao}/`);
+    }
+    async function Excluir(id_funcao) {
+        const resposta = await ExcluirDados(`/funcoes/excluir/${id_funcao}/`);
+    }
+    async function Pesquisar() {
+
+        const txtNomeFuncaoPesquisar = obterElemento('txtNomeFuncaoPesquisar');
+        const nomeFuncao = encodeURIComponent(txtNomeFuncaoPesquisar.value.trim());
+
+        const url = `/funcoes/pesquisar/?nome=${nomeFuncao}`;
+        const resultado = await PesquisarDados(url);
+
+        let linha = '';
+
+        if (resultado.dados) {
+            resultado.dados.forEach((funcao, index) => {
+                linha += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${funcao.nome}</td>
+                <td>${funcao.sigla || '-'}</td>
+                <td>${funcao.num_servidores}</td>
+                <td>${formatarDataHora(funcao.data_cadastro)}</td>
+                <td align="center">
+                    <button data-id="${funcao.id}" class="btn btn-default"
+                        onclick="abrir('modalEditarFuncao'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                    </button>
+
+                    <button data-id="${funcao.id}" class="btn btn-error"
+                        onclick="abrir('modalExcluirFuncao'); setarDataId('btnExcluir', this.dataset.id)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+            });
+        } else {
+            linha = `<tr><td colspan="6" align="center">Nenhum registro encontrado.</td></tr>`;
+        }
+
+        setarHTML('tabela_dados', linha);
+    }
+
+</script>
+{% endblock %}

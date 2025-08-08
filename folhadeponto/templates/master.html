@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'img/logo_app.png' %}">
+    <title>Folha de Ponto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+
+<body>
+    <nav id="sidebar">
+        <ul>
+            <li>
+                <span class="logo">Folha de Ponto</span>
+                <button onclick=toggleSidebar() id="toggle-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z" />
+                    </svg>
+                </button>
+            </li>
+            <li>
+                <a href="/">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="M240-200h120v-200q0-17 11.5-28.5T400-440h160q17 0 28.5 11.5T600-400v200h120v-360L480-740 240-560v360Zm-80 0v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H560q-17 0-28.5-11.5T520-160v-200h-80v200q0 17-11.5 28.5T400-120H240q-33 0-56.5-23.5T160-200Zm320-270Z" />
+                    </svg>
+                    <span>Ínicio</span>
+                </a>
+            </li>
+            {% if user.is_superuser %}
+            <li>
+                <button onclick=toggleSubMenu(this) class="dropdown-btn">
+                    <!-- Ícone da pasta -->
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Z" />
+                    </svg>
+                    <span>Cadastros</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z" />
+                    </svg>
+                </button>
+                <ul class="sub-menu" id="ul_menu_cadastros">
+                    <div>
+                        <li id="li_servidores"><a href="/servidores/">Servidores</a></li>
+                        <li id="li_setores"><a href="/setores/">Setores</a></li>
+                        <li id="li_carreiras"><a href="/carreiras/">Carreiras</a></li>
+                        <li id="li_areas"><a href="/areas/">Áreas</a></li>
+                        <li id="li_cargos"><a href="/cargos/">Cargos</a></li>
+                        <li id="li_funcoes"><a href="/funcoes/">Funções</a></li>
+                        <li id="li_usuarios"><a href="/usuarios/">Usuários</a></li>
+                    </div>
+                </ul>
+            </li>
+            {% endif %}
+            <li>
+                <button onclick=toggleSubMenu(this) class="dropdown-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="m221-313 142-142q12-12 28-11.5t28 12.5q11 12 11 28t-11 28L250-228q-12 12-28 12t-28-12l-86-86q-11-11-11-28t11-28q11-11 28-11t28 11l57 57Zm0-320 142-142q12-12 28-11.5t28 12.5q11 12 11 28t-11 28L250-548q-12 12-28 12t-28-12l-86-86q-11-11-11-28t11-28q11-11 28-11t28 11l57 57Zm339 353q-17 0-28.5-11.5T520-320q0-17 11.5-28.5T560-360h280q17 0 28.5 11.5T880-320q0 17-11.5 28.5T840-280H560Zm0-320q-17 0-28.5-11.5T520-640q0-17 11.5-28.5T560-680h280q17 0 28.5 11.5T880-640q0 17-11.5 28.5T840-600H560Z" />
+                    </svg>
+                    <span>Ponto</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="M480-361q-8 0-15-2.5t-13-8.5L268-556q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-372q-6 6-13 8.5t-15 2.5Z" />
+                    </svg>
+                </button>
+                <ul class="sub-menu" id="ul_menu_ponto">
+                    <div>
+                        {% if user.is_superuser %}
+                        <li id="li_datas"><a href="/datas/">Datas</a></li>
+                        {% endif %}
+                        <li id="li_folhas"><a href="/folhas/">Folhas</a></li>
+                    </div>
+                </ul>
+            </li>
+            <li>
+                <a href="/perfil">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" />
+                    </svg>
+                    <span>Perfil</span>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" onclick="abrir('modalLogoff')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#e8eaed">
+                        <path
+                            d="M480-120q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-480q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840v80q-117 0-198.5 81.5T200-480q0 117 81.5 198.5T480-200v80Zm160-160-56-57 103-103H360v-80h327L584-624l56-56 200 200-200 200Z" />
+                    </svg>
+
+                    <span>Sair</span>
+                </a>
+            </li>
+        </ul>
+
+    </nav>
+    <main>
+
+        <div class="user-menu-container">
+            <button id="userMenuButton" class="user-button">
+                <img src="https://img.freepik.com/premium-vector/user-icon-icon_1076610-59410.jpg"
+                    alt="Avatar do usuário" class="avatar" />
+                {% if user.is_authenticated %}
+                <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                {% else %}
+                <span class="user-name">Visitante</span>
+                {% endif %}
+                <svg width="16" height="16" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z" />
+                </svg>
+            </button>
+            <ul id="userDropdown" class="user-dropdown oculto">
+                <li><a href="/perfil">👤 Perfil</a></li>
+                <!--<li><a href="#">⚙️ Configurações</a></li>-->
+                <li><a href="javascript:void(0)" onclick="abrir('modalLogoff')">🚪 Sair</a></li>
+            </ul>
+        </div>
+
+        <div id="conteudo" class="mt-5">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+    </main>
+
+    <div id="modalLogoff" class="modal" tabindex="-1">
+        <div class="modal-header">
+            <h2 id="modalTitulo" class="modal-title">Sair</h2>
+            <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+                onclick="fechar('modalLogoff')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Deseja realmente sair?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default modal-fechar" onclick="fechar('modalLogoff')">Cancelar</button>
+            <a href="/sair" class="btn btn-error" style="text-decoration: none; text-align: center;">
+                Sair</a>
+        </div>
+    </div>
+    <div id="modalLogoffBackdrop" class="modal-backdrop"></div>
+
+    <div id="loadingSpinner" class="loading-spinner-container" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/graficos.js' %}"></script>
+    <script>
+        function obterElemento(id) {
+            return document.getElementById(id);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentPath = window.location.pathname;
+            const ulMenuCadastros = obterElemento('ul_menu_cadastros');
+            const ulMenuPonto = obterElemento('ul_menu_ponto');
+
+            const rotasCadastros = [
+                { path: 'servidores', liId: 'li_servidores' },
+                { path: 'cargos', liId: 'li_cargos' },
+                { path: 'setores', liId: 'li_setores' },
+                { path: 'funcoes', liId: 'li_funcoes' },
+                { path: 'feriados', liId: 'li_feriados' },
+                { path: 'carreiras', liId: 'li_carreiras' },
+                { path: 'areas', liId: 'li_areas' },
+                { path: 'usuarios', liId: 'li_usuarios' },
+            ];
+
+
+
+            for (let rota of rotasCadastros) {
+                if (currentPath.includes(rota.path)) {
+                    if (ulMenuCadastros) ulMenuCadastros.classList.add('show');
+                    const liItem = obterElemento(rota.liId);
+                    if (liItem) liItem.classList.add('active');
+                    return;
+                }
+            }
+
+            const rotasPonto = [
+                { path: 'datas', liId: 'li_datas' },
+                { path: 'folhas/criar', liId: 'li_criar' },
+                { path: 'folhas', liId: 'li_folhas' },
+            ]
+
+            for (let rota of rotasPonto) {
+                if (currentPath.includes(rota.path)) {
+                    if (ulMenuPonto) ulMenuPonto.classList.add('show');
+                    const liItem = obterElemento(rota.liId);
+                    if (liItem) liItem.classList.add('active');
+                    return;
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

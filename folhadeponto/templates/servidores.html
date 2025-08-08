@@ -1,0 +1,675 @@
+{% extends "master.html" %}
+
+{% block title %}
+Setores
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-sm-5">
+      <label for="txtCargoServidor">Cargo</label>
+      <select class="w-100" id="txtCargoServidor">
+        <option value="0" selected disabled>---</option>
+        {% for cargo in cargos %}
+        <option value="{{ cargo.id }}">
+          {% if not cargo.area__nome == "-" %}
+          {{ cargo.nome }} ({{ cargo.area__nome }})
+          {% else %}
+          {{ cargo.nome }}
+          {% endif %}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-1">
+      <label for="txtSetorServidor">Setor</label>
+      <select class="w-100" id="txtSetorServidor">
+        <option value="0" selected disabled>---</option>
+        {% for setor in setores %}
+        <option value="{{ setor.id }}">{{ setor.sigla }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-4">
+      <label for="txtFuncaoServidor">Função</label>
+      <select class="w-100" id="txtFuncaoServidor">
+        <option value="" selected>--</option>
+        {% for funcao in funcoes %}
+        <option value="{{ funcao.id }}">{{ funcao.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-2">
+      <label for="txtTipoServidor">Tipo</label>
+      <select class="w-100" id="txtTipoServidor">
+        <option value="" disabled>---</option>
+        <option value="EFETIVO" selected>EFETIVO</option>
+        <option value="CONTRATADO">CONTRATADO</option>
+      </select>
+    </div>
+    <div class="col-sm-5">
+      <label for="txtNomeServidor">Nome</label>
+      <input type="text" class="form-control upper" id="txtNomeServidor">
+    </div>
+    <div class="col-sm-2">
+      <label for="txtMatriculaServidor">Matrícula</label>
+      <input type="number" class="form-control upper" id="txtMatriculaServidor">
+    </div>
+    <div class="col-sm-2">
+      <label for="txtDataExercicioServidor">Exercício</label>
+      <input type="date" class="form-control upper" id="txtDataExercicioServidor">
+    </div>
+    <div class="col-sm-1">
+      <label for="txtServidorEmPGD">Em PGD?</label>
+      <label class="switch item-centro mt-2">
+        <input type="checkbox" id="txtServidorEmPGD">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="col-sm-2 item-centro">
+      <button type="button" class="btn btn-default mt-4 form-control" onclick="Inserir()">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <label for="txtNomeServidorPesquisar">Listagem de Servidores</label>
+  <div class="row">
+
+    <div class="col-sm-5">
+      <label for="txtNomeServidorPesquisar">Servidor?</label>
+      <input type="text" class="form-control w-100" id="txtNomeServidorPesquisar"
+        placeholder="Informe o nome do servidor">
+    </div>
+
+    <div class="col-sm-2">
+      <label for="txtServidorEmAfastamentoPesquisar">Afastado? </label>
+      <select class="w-100" id="txtServidorEmAfastamentoPesquisar">
+        <option value="" selected>---</option>
+        <option value="0">NÃO</option>
+        <option value="1">SIM</option>
+      </select>
+    </div>
+
+    <div class="col-sm-2">
+      <label for="txtServidorTipoPesquisar">Tipo? </label>
+      <select class="w-100" id="txtServidorTipoPesquisar">
+        <option value="" selected>---</option>
+        <option value="EFETIVO">EFETIVO</option>
+        <option value="CONTRATADO">CONTRATADO</option>
+      </select>
+    </div>
+
+
+    <div class="col-sm-3">
+      <label for="txtServidorEmPGDPesquisar">Em PGD?</label>
+      <select class="w-100" id="txtServidorEmPGDPesquisar">
+        <option value="" selected>---</option>
+        <option value="0">NÃO</option>
+        <option value="1">SIM</option>
+      </select>
+    </div>
+
+
+    <div class="col-sm-3">
+      <label for="txtCargoServidorPesquisar">Cargo?</label>
+      <select class="w-100" id="txtCargoServidorPesquisar">
+        <option value="" selected>---</option>
+        {% for cargo in cargos %}
+        <option value="{{ cargo.id }}">
+          {% if not cargo.area__nome == "-" %}
+          {{ cargo.nome }} ({{ cargo.area__nome }})
+          {% else %}
+          {{ cargo.nome }}
+          {% endif %}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-sm-2">
+      <label for="txtAreaCargoServidorPesquisar">Área?</label>
+      <select class="w-100" id="txtAreaCargoServidorPesquisar">
+        <option value="" selected>---</option>
+        {% for area in areas %}
+        <option value="{{ area.id }}">
+          {{ area.nome | default:"-" }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-sm-1">
+      <label for="txtSetorServidorPesquisar">Setor?</label>
+      <select class="w-100" id="txtSetorServidorPesquisar">
+        <option value="" selected>---</option>
+        {% for setor in setores %}
+        <option value="{{ setor.id }}">{{ setor.sigla }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-sm-4">
+      <label for="txtFuncaoServidorPesquisar">Função?</label>
+      <select class="w-100" id="txtFuncaoServidorPesquisar">
+        <option value="" selected>---</option>
+        {% for funcao in funcoes %}
+        <option value="{{ funcao.id }}">{{ funcao.nome}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-1 mt-1">
+      <label>&nbsp;</label>
+      <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+          aria-hidden="true"></i></button>
+    </div>
+    <div class="col-sm-1 mt-1">
+      <label>&nbsp;</label>
+      <button class="btn btn-default form-control" onclick="location.reload()"><i class="fa fa-refresh"
+          aria-hidden="true"></i></button>
+    </div>
+    <div class="col-sm-12 table-responsive">
+      <table class="table tabela-customizada" id="tabela_Setors">
+        <thead>
+          <tr align="left">
+            <th>#</th>
+            <th>Nome</th>
+            <th>Matrícula</th>
+            <th>Cargo</th>
+            <th>Função</th>
+            <th>Setor</th>
+            <th>Tipo</th>
+            <th>Exercício</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tabela_dados">
+
+          {% for servidor in servidores %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              {% if servidor.em_afastamento %}
+              {{ servidor.nome }} <br /> <strong>Afastado</strong>
+              {% else %}
+              {{ servidor.nome }}
+              {% endif %}
+            </td>
+            <td>{{ servidor.matricula }}</td>
+            <td>
+              {% if not servidor.cargo__area__nome == "-" %}
+              {{ servidor.cargo__nome }} ({{ servidor.cargo__area__nome }})
+              {% else %}
+              {{ servidor.cargo__nome }}
+              {% endif %}
+            </td>
+            <td>{{ servidor.funcao__nome | default:"-" }}</td>
+            <td>{{ servidor.setor__sigla | default:"-"}}</td>
+            <td>
+              {{ servidor.tipo|default:"-" }}
+              {% if servidor.tipo == "CONTRATADO" %}
+              <strong>
+                {% if servidor.contrato__data_fim_contrato %}
+                <p style="font-size: xx-small; line-height: 1.2;">Até: {{
+                  servidor.contrato__data_fim_contrato|date:"d/m/Y" }}<br />{{servidor.dias_restantes}} dias restantes
+                </p>
+                {% else %}
+                
+                {% endif %}
+              </strong>
+              {% endif %}
+            </td>
+            <td>{{ servidor.data_exercicio|date:"d/m/Y"}}</td>
+            <td>
+              <div class="custom-dropdown">
+                <button class="custom-dropdown-toggle" onclick="toggleDropdown(this)">
+                  <i class="fa fa-cog" aria-hidden="true"></i>
+                </button>
+                <ul class="custom-dropdown-menu">
+                  <li>
+                    <a data-id="{{ servidor.id }}" class="custom-dropdown-item" href="javascript:void(0)"
+                      onclick="abrir('modalEditarServidor'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+                      <i class="fa fa-edit" aria-hidden="true"></i> Editar</a>
+                  </li>
+                  <li>
+                    {% if servidor.tipo == "EFETIVO" %}
+                    <a data-id="{{ servidor.id }}" class="custom-dropdown-item" href="javascript:void(0)"
+                      onclick="abrir('modalAfastamentoServidor'); ObterAfastamento(this.dataset.id); setarDataId('btnAfastamento', this.dataset.id)">
+                      <i class="fa fa-exchange" aria-hidden="true"></i> Afastamento</a>
+                    {% else %}
+                    <a data-id="{{ servidor.id }}" class="custom-dropdown-item" href="javascript:void(0)"
+                      onclick="abrir('modalPeriodoContratoServidor'); setarDataId('btnPeriodoContrato', this.dataset.id); ObterContrato(this.dataset.id)">
+                      <i class="fa fa-calendar" aria-hidden="true"></i> Período contrato</a>
+                    {% endif %}
+                  </li>
+                  <li>
+                    <a data-id="{{ servidor.id }}" class="custom-dropdown-item" href="javascript:void(0)"
+                      onclick="abrir('modalExcluirServidor'); setarDataId('btnExcluir', this.dataset.id)">
+                      <i class="fa fa-trash" aria-hidden="true"></i> Excluir</a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="modalEditarServidor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Editar Servidor</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalEditarServidor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <label for="txtCargoServidorEditar">Cargo</label>
+    <select class="w-100" id="txtCargoServidorEditar">
+      <option value="0" selected disabled>---</option>
+      {% for cargo in cargos %}
+      <option value="{{ cargo.id }}">{{ cargo.nome }} ({{ cargo.area__nome }})</option>
+      {% endfor %}
+    </select>
+    <label for="txtTipoServidorEditar">Tipo</label>
+    <select class="w-100" id="txtTipoServidorEditar">
+      <option value="" disabled>---</option>
+      <option value="EFETIVO" selected>EFETIVO</option>
+      <option value="CONTRATADO">CONTRATADO</option>
+    </select>
+    <label for="txtSetorServidorEditar">Setor</label>
+    <select class="w-100" id="txtSetorServidorEditar">
+      <option value="0" selected disabled>---</option>
+      {% for setor in setores %}
+      <option value="{{ setor.id }}">{{ setor.sigla }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="txtFuncaoServidorEditar">Função</label>
+    <select class="w-100" id="txtFuncaoServidorEditar">
+      <option value="" selected>---</option>
+      {% for funcao in funcoes %}
+      <option value="{{ funcao.id }}">{{ funcao.nome }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="txtNomeServidorEditar">Nome</label>
+    <input type="text" class="form-control upper" id="txtNomeServidorEditar">
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="txtMatriculaServidorEditar">Matrícula</label>
+        <input type="number" class="form-control upper" id="txtMatriculaServidorEditar">
+      </div>
+      <div class="col-sm-6">
+        <label for="txtDataExercicioServidorEditar">Exercício</label>
+        <input type="date" class="form-control upper" id="txtDataExercicioServidorEditar">
+      </div>
+      <div class="col-sm-12">
+        <label for="txtServidorEmPGDEditar">Em PGD?</label>
+        <select class="w-100" id="txtServidorEmPGDEditar">
+          <option value="" selected>---</option>
+          <option value="0">NÃO</option>
+          <option value="1">SIM</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarServidor')">Cancelar</button>
+    <button class="btn btn-success" id="btnEditar" onclick="Editar(this.dataset.id)"><i class="fa fa-pencil-square-o"
+        aria-hidden="true"></i> Confirmar</button>
+  </div>
+</div>
+<div id="modalEditarServidorBackdrop" class="modal-backdrop"></div>
+
+<div id="modalExcluirServidor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Excluir Servidor</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalExcluirServidor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <p>Deseja realmente excluir?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirServidor')">Cancelar</button>
+    <button class="btn btn-error" id="btnExcluir" onclick="Excluir(this.dataset.id)"><i class="fa fa-trash"></i>
+      Confirmar</button>
+  </div>
+</div>
+<div id="modalExcluirServidorBackdrop" class="modal-backdrop"></div>
+
+
+<div id="modalAfastamentoServidor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Afastamento de Servidor</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal"
+      onclick="fechar('modalAfastamentoServidor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-6" style="align-items: center;">
+        <label for="txtEmAfastamentoServidor">Em afastamento?</label>
+      </div>
+      <div class="col-sm-6 item-direita">
+        <label class="switch">
+          <input type="checkbox" id="txtEmAfastamentoServidor"
+            onchange="exibirPeloCheckBox(this, 'div_em_afastamento')">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+    <div id="div_em_afastamento" hidden>
+      <label for="txtTipoAfastamentoServidor">Tipo afastamento</label>
+      <select class="w-100" id="txtTipoAfastamentoServidor">
+        <option value="" selected disabled>---</option>
+        <option value="1">Afastamento para Tratamento de Saúde</option>
+        <option value="2">Afastamento por Motivo de Doença em Pessoa da Família</option>
+        <option value="3">Afastamento para Serviço Militar</option>
+        <option value="4">Afastamento para Atividade Política</option>
+        <option value="5">Afastamento para Capacitação</option>
+        <option value="6">Afastamento para Pós-Graduação (Stricto Sensu)</option>
+        <option value="7">Afastamento para Missão ou Estudo no Exterior</option>
+        <option value="8">Afastamento para Atuar em Organismo Internacional</option>
+        <option value="9">Afastamento para Mandato Classista</option>
+        <option value="10">Afastamento por Prisão Preventiva ou Condenação Criminal</option>
+        <option value="11">Afastamento Preventivo em Processo Administrativo Disciplinar (PAD)</option>
+        <option value="12">Afastamento por Licença Maternidade, Paternidade ou Adoção</option>
+        <option value="13">Afastamento para Exercício de Mandato Eletivo</option>
+      </select>
+      <div class="row">
+        <div class="col-sm-6">
+          <label for="txtDataInicioAfastamentoServidor">Ínicio</label>
+          <input type="date" class="form-control" id="txtDataInicioAfastamentoServidor">
+        </div>
+        <div class="col-sm-6">
+          <label for="txtDataFimAfastamentoServidor">Fim</label>
+          <input type="date" class="form-control" id="txtDataFimAfastamentoServidor">
+        </div>
+      </div>
+      <label for="txtSubstitutoServidorEditar">Substituto</label>
+      <select class="w-100" id="txtSubstitutoServidorEditar">
+        <option value="" selected>---</option>
+        {% for servidor in servidores_contratados %}
+        <option value="{{ servidor.id }}">{{ servidor.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalAfastamentoServidor')">Cancelar</button>
+    <button class="btn btn-success" id="btnAfastamento" onclick="AdicionarAfatasmentoDoServidor(this.dataset.id)">
+      Confirmar</button>
+  </div>
+</div>
+<div id="modalAfastamentoServidorBackdrop" class="modal-backdrop"></div>
+
+<div id="modalPeriodoContratoServidor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 class="modal-title">Período do Contrato</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalPeriodoContratoServidor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="txtDataInicioContrato">Ínicio</label>
+        <input type="date" class="form-control" id="txtDataInicioContrato">
+      </div>
+      <div class="col-sm-6">
+        <label for="txtDataFimContrato">Fim</label>
+        <input type="date" class="form-control" id="txtDataFimContrato">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalPeriodoContratoServidor')">Cancelar</button>
+    <button class="btn btn-success" id="btnPeriodoContrato" onclick="InserirContrato(this.dataset.id)">
+      Confirmar</button>
+  </div>
+</div>
+<div id="modalPeriodoContratoServidorBackdrop" class="modal-backdrop"></div>
+
+<script>
+  async function Inserir() {
+
+    const nomeServidor = obterElemento('txtNomeServidor');
+    const matriculaServidor = obterElemento('txtMatriculaServidor');
+    const dataExercicioServidor = obterElemento('txtDataExercicioServidor');
+    const idCargoServidor = obterElemento('txtCargoServidor');
+    const idSetorServidor = obterElemento('txtSetorServidor');
+    const idFuncaoServidor = obterElemento('txtFuncaoServidor');
+    const servidorTipo = obterElemento('txtTipoServidor');
+    const servidorEmPGD = obterElemento('txtServidorEmPGD');
+
+
+
+    const campos = [nomeServidor, matriculaServidor, dataExercicioServidor, idCargoServidor, idSetorServidor, servidorEmPGD];
+
+    if (algumCampoVazio(campos)) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const formData = new FormData()
+    formData.append('nome', nomeServidor.value.toUpperCase())
+    formData.append('matricula', matriculaServidor.value.toUpperCase());
+    formData.append('data_exercicio', dataExercicioServidor.value);
+    formData.append('cargo_id', idCargoServidor.value);
+    formData.append('setor_id', idSetorServidor.value);
+    formData.append('funcao_id', idFuncaoServidor.value);
+    formData.append('tipo', servidorTipo.value);
+    formData.append('em_pgd', servidorEmPGD.checked ? 1 : 0);
+    const resposta = await InserirDados('/servidores/adicionar/', formData);
+  }
+  async function Obter(id_servidor) {
+    const resposta = await ObterDados(`/servidores/obter/${id_servidor}/`);
+    if (resposta.dados) {
+
+      setarValor('txtNomeServidorEditar', resposta.dados.nome);
+      setarValor('txtMatriculaServidorEditar', resposta.dados.matricula);
+      setarValor('txtDataExercicioServidorEditar', resposta.dados.data_exercicio);
+      setarValor('txtCargoServidorEditar', resposta.dados.cargo__id);
+      setarValor('txtServidorEmPGDEditar', resposta.dados.em_pgd ? 1 : 0);
+      setarValor('txtTipoServidorEditar', resposta.dados.tipo);
+      setarValor('txtEmAfastamentoServidor', resposta.dados.em_afastamento ? marcarCheckbox('txtEmAfastamentoServidor', true) : marcarCheckbox('txtEmAfastamentoServidor', false))
+      
+      if (resposta.dados.setor__id) {
+        setarValor('txtSetorServidorEditar', resposta.dados.setor__id);
+      }
+      if (resposta.dados.funcao__id) {
+        setarValor('txtFuncaoServidorEditar', resposta.dados.funcao__id);
+      }
+    }
+  }
+
+  async function ObterAfastamento(id_servidor) {
+    const resposta = await ObterDados(`/servidores/obter/${id_servidor}/`);
+    if (resposta.dados) {
+      if (resposta.dados.em_afastamento) {
+
+        setarValor('txtEmAfastamentoServidor', marcarCheckbox('txtEmAfastamentoServidor', true));
+        setarValor('txtTipoAfastamentoServidor', resposta.dados.tipo_afastamento)
+        setarValor('txtDataInicioAfastamentoServidor', resposta.dados.data_inicio_afastamento)
+        setarValor('txtDataFimAfastamentoServidor', resposta.dados.data_fim_afastamento)
+        setarValor('txtSubstitutoServidorEditar', resposta.dados.substituto)
+
+        obterElemento('div_em_afastamento').style.display = 'block';
+
+      } else {
+        setarValor('txtEmAfastamentoServidor', marcarCheckbox('txtEmAfastamentoServidor', false));
+        obterElemento('div_em_afastamento').style.display = 'none';
+        setarValor('txtTipoAfastamentoServidor', '')
+        setarValor('txtDataInicioAfastamentoServidor', '')
+        setarValor('txtDataFimAfastamentoServidor', '')
+        setarValor('txtSubstitutoServidorEditar', '')
+      }
+    }
+  }
+
+
+  async function ObterContrato(id_servidor) {
+    const resposta = await ObterDados(`/contratos/obter/${id_servidor}/`);
+    if (resposta.dados) {
+      setarValor('txtDataFimContrato', resposta.dados.data_inicio_contrato);
+      setarValor('txtDataInicioContrato', resposta.dados.data_fim_contrato);
+    }
+  }
+
+
+  async function Editar(id_servidor) {
+
+    const nomeServidor = obterElemento('txtNomeServidorEditar');
+    const matriculaServidor = obterElemento('txtMatriculaServidorEditar');
+    const dataExercicioServidor = obterElemento('txtDataExercicioServidorEditar');
+    const idCargoServidor = obterElemento('txtCargoServidorEditar');
+    const idSetorServidor = obterElemento('txtSetorServidorEditar');
+    const idFuncaoServidor = obterElemento('txtFuncaoServidorEditar');
+    const tipo = obterElemento('txtTipoServidorEditar');
+    const emPGD = obterElemento('txtServidorEmPGDEditar');
+
+    const campos = [nomeServidor, matriculaServidor, dataExercicioServidor, idCargoServidor, idSetorServidor, emPGD, tipo];
+
+    if (algumCampoVazio(campos)) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const formData = new FormData()
+    formData.append('nome', nomeServidor.value.toUpperCase())
+    formData.append('matricula', matriculaServidor.value);
+    formData.append('data_exercicio', dataExercicioServidor.value);
+    formData.append('cargo_id', idCargoServidor.value);
+    formData.append('setor_id', idSetorServidor.value);
+    formData.append('funcao_id', idFuncaoServidor.value);
+    formData.append('tipo', tipo.value);
+    formData.append('em_pgd', emPGD.value);;
+
+    const resposta = await EditarDados(`/servidores/editar/${id_servidor}/`, formData);
+  }
+  async function Excluir(id_servidor) {
+    const resposta = await ExcluirDados(`/servidores/excluir/${id_servidor}/`);
+  }
+
+  async function InserirContrato(id_servidor) {
+
+    const txtDataInicioContrato = obterElemento('txtDataInicioContrato');
+    const txtDataFimContrato = obterElemento('txtDataFimContrato');
+
+    campos = [txtDataInicioContrato, txtDataFimContrato];
+
+    if (algumCampoVazio(campos)) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const formData = new FormData()
+    formData.append('servidor_id', id_servidor);
+    formData.append('data_inicio_contrato', txtDataInicioContrato.value);
+    formData.append('data_fim_contrato', txtDataFimContrato.value);
+
+    const resposta = await InserirDados(`/contratos/adicionar/`, formData)
+
+  }
+
+  async function Pesquisar() {
+
+    const txtNomeServidorPesquisar = obterElemento('txtNomeServidorPesquisar');
+    const txtCargoServidorPesquisar = obterElemento('txtCargoServidorPesquisar');
+    const txtSetorServidorPesquisar = obterElemento('txtSetorServidorPesquisar');
+    const txtFuncaoServidorPesquisar = obterElemento('txtFuncaoServidorPesquisar');
+    const txtAreaCargoServidorPesquisar = obterElemento('txtAreaCargoServidorPesquisar');
+    const txtServidorEmPGDPesquisar = obterElemento('txtServidorEmPGDPesquisar');
+    const txtServidorEmAfastamentoPesquisar = obterElemento('txtServidorEmAfastamentoPesquisar');
+    const txtServidorTipoPesquisar = obterElemento('txtServidorTipoPesquisar');
+
+    const nome = encodeURIComponent(txtNomeServidorPesquisar.value.trim());
+    const cargo = encodeURIComponent(txtCargoServidorPesquisar.value.trim());
+    const setor = encodeURIComponent(txtSetorServidorPesquisar.value.trim());
+    const funcao = encodeURIComponent(txtFuncaoServidorPesquisar.value.trim());
+    const area = encodeURIComponent(txtAreaCargoServidorPesquisar.value.trim());
+    const em_pgd = encodeURIComponent(txtServidorEmPGDPesquisar.value.trim());
+    const em_afastamento = encodeURIComponent(txtServidorEmAfastamentoPesquisar.value.trim());
+    const tipo = encodeURIComponent(txtServidorTipoPesquisar.value.trim());
+
+    const url = `/servidores/pesquisar/?nome=${nome}&idCargo=${cargo}&idSetor=${setor}&idFuncao=${funcao}&idArea=${area}&em_pgd=${em_pgd}&afastado=${em_afastamento}&tipo=${tipo}`;
+
+    const resultado = await PesquisarDados(url);
+    let linha = '';
+
+    if (resultado.dados && resultado.dados.length > 0) {
+      let linha = '';
+      resultado.dados.forEach((servidor, index) => {
+        const nome = servidor.em_afastamento
+          ? `${servidor.nome}<br><strong>Afastado</strong>`
+          : servidor.nome;
+
+        const tipo = servidor.tipo || '-';
+        let tipoInfo = tipo;
+
+        if (tipo === 'CONTRATADO') {
+          if (servidor.contrato__data_fim_contrato) {
+            tipoInfo += `<strong>
+          <p style="font-size: xx-small; line-height: 1.2;">
+            Até: ${formatarData(servidor.contrato__data_fim_contrato)}<br>
+            ${servidor.dias_restantes} dias restantes
+          </p>
+        </strong>`;
+          } else {
+            tipoInfo += '';
+          }
+        }
+
+        const menuEspecifico = tipo === 'EFETIVO'
+          ? `<a data-id="${servidor.id}" class="custom-dropdown-item" href="javascript:void(0)"
+            onclick="abrir('modalAfastamentoServidor'); ObterAfastamento(this.dataset.id); setarDataId('btnAfastamento', this.dataset.id)">
+            <i class="fa fa-exchange" aria-hidden="true"></i> Afastamento</a>`
+          : `<a data-id="${servidor.id}" class="custom-dropdown-item" href="javascript:void(0)"
+            onclick="abrir('modalPeriodoContratoServidor'); setarDataId('btnPeriodoContrato', this.dataset.id); ObterContrato(this.dataset.id)">
+            <i class="fa fa-calendar" aria-hidden="true"></i> Período contrato</a>`;
+
+        linha += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${nome}</td>
+        <td>${servidor.matricula}</td>
+        <td>${servidor.cargo__nome || '-'} (${servidor.cargo__area__nome || '-'})</td>
+        <td>${servidor.funcao__nome || '-'}</td>
+        <td>${servidor.setor__sigla || '-'}</td>
+        <td>${tipoInfo}</td>
+        <td>${formatarData(servidor.data_exercicio)}</td>
+        <td>
+          <div class="custom-dropdown">
+            <button class="custom-dropdown-toggle" onclick="toggleDropdown(this)">
+              <i class="fa fa-cog" aria-hidden="true"></i>
+            </button>
+            <ul class="custom-dropdown-menu">
+              <li>
+                <a data-id="${servidor.id}" class="custom-dropdown-item" href="javascript:void(0)"
+                  onclick="abrir('modalEditarServidor'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+                  <i class="fa fa-edit" aria-hidden="true"></i> Editar</a>
+              </li>
+              <li>${menuEspecifico}</li>
+              <li>
+                <a data-id="${servidor.id}" class="custom-dropdown-item" href="javascript:void(0)"
+                  onclick="abrir('modalExcluirServidor'); setarDataId('btnExcluir', this.dataset.id)">
+                  <i class="fa fa-trash" aria-hidden="true"></i> Excluir</a>
+              </li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    `;
+      });
+      setarHTML('tabela_dados', linha);
+    } else {
+      setarHTML('tabela_dados', '<tr><td colspan="9" align="center">Nenhum registro encontrado.</td></tr>');
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends "master.html" %}
+{% load static %}
+{% block title %}
+Cria Folha de Ponto
+{% endblock %}
+
+{% block content %}
+<!-- Inclua no HTML -->
+<div class="tabs">
+  <ul class="tab-nav">
+    <li class="active" data-tab="tab1"><i class="fa fa-list" aria-hidden="true"></i> Listagem de fichas</li>
+    <li data-tab="tab2"><i class="fa fa-plus" aria-hidden="true"></i> Criar</li>
+  </ul>
+  <div class="tab-content active" id="tab1">
+
+    <div class="row">
+      <div class="col-sm-8">
+        <select class="w-100" id="txtSetorPesquisar">
+          <option value="0" selected disabled>Selecione o setor</option>
+          {% for setor in setores %}
+          <option value="{{ setor.id }}">{{ setor.nome }} - {{ setor.sigla }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-2">
+        <input type="month" id="txtDataPesquisar" class="form-control">
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+            aria-hidden="true"></i></button>
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-default form-control" onclick="location.reload();"><i class="fa fa-refresh"
+            aria-hidden="true"></i></button>
+      </div>
+    </div>
+
+    <table class="table tabela-customizada" id="tabela_carreiras">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th align="left">Setor</th>
+          <th align="left">Mês/Ano</th>
+          <th align="left">Nº servidores</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tabela_dados">
+        {% for folha in folhas %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ folha.setor__nome }} - {{ folha.setor__sigla }}</td>
+          <td>{{ folha.mes_ano|slice:"5:7" }}/{{ folha.mes_ano|slice:":4" }}</td>
+          <td>{{ folha.num_servidores }}</td>
+          <td align="center">
+            <button data-id="{{ folha.id }}" class="btn btn-success" onclick="ObterFolha(this.dataset.id)"><i
+                class="fa fa-print" aria-hidden="true"></i></button>
+            <button data-id="{{ folha.id }}" class="btn btn-default" onclick="ObterFolha(this.dataset.id)"><i
+                class="fa fa-edit" aria-hidden="true"></i></button>
+            <button data-id="{{ folha.id }}" class="btn btn-error"
+              onclick="abrir('modalExcluirFolha'); setarDataId('btnExcluir', this.dataset.id);"><i
+                class="fa fa-trash"></i></button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-content" id="tab2">
+    <div class="row" id="div_impressao">
+      <div class="col-sm-7">
+        <label for="txtSetor">Setor</label>
+        <select class="w-100" id="txtSetor" onchange="ObterServidoresDoSetor(this.value)">
+          <option value="0" selected disabled>Selecione o setor</option>
+          {% for setor in setores %}
+          <option value="{{ setor.id }}">{{ setor.nome }} - {{ setor.sigla }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-3">
+        <label for="txtData">Mês</label>
+        <input type="month" id="txtData" class="form-control" onchange="ObterDatasMesAnoSelecionado(this.value)">
+      </div>
+      <div class="col-sm-2">
+        <label for="btnEmitirFolhas">&nbsp</label>
+        <button id="btnEmitirFolhas" onclick="gerarTabelaPonto()" class="btn btn-default form-control "><i
+            class="fa fa-plus" aria-hidden="true"></i> CRIAR</button>
+      </div>
+      <div class="col-sm-12">
+        <textarea name="editor1" id="editor1"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalExcluirFolha" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Excluir Folha</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalExcluirFolha')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <p>Deseja realmente excluir?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirFolha')">Cancelar</button>
+    <button class="btn btn-error" id="btnExcluir" onclick="Excluir(this.dataset.id)">
+      <i class="fa fa-trash"></i> Confirmar</button>
+  </div>
+</div>
+<div id="modalExcluirFolhaBackdrop" class="modal-backdrop"></div>
+
+<script src="https://suap.ifma.edu.br/static/ckeditor/ckeditor/ckeditor.js"></script>
+<script src="{% static 'js/ckeditor_settings.js' %}"></script>
+
+<script>
+
+  async function Pesquisar() {
+
+    const txtSetorPesquisar = obterElemento('txtSetorPesquisar');
+    const txtDataPesquisar = obterElemento('txtDataPesquisar');
+
+    const setor = encodeURIComponent(txtSetorPesquisar.value.trim());
+    const data = encodeURIComponent(txtDataPesquisar.value.trim());
+
+    const url = `/folhas/pesquisar/?setor=${setor}&data=${data}`;
+    const resposta = await PesquisarDados(url);
+    let linha = '';
+
+    if (resposta.dados) {
+
+      resposta.dados.forEach((folha, index) => {
+
+        const mesAno = folha.mes_ano;
+        const mes = mesAno?.substring(5, 7) || '--';
+        const ano = mesAno?.substring(0, 4) || '----';
+
+        linha += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${folha.setor__nome} - ${folha.setor__sigla}</td>
+        <td>${mes}/${ano}</td>
+        <td>${folha.num_servidores}</td>
+        <td align="center">
+          <button data-id="${folha.id}" class="btn btn-success" onclick="ObterFolha(this.dataset.id)">
+            <i class="fa fa-print" aria-hidden="true"></i>
+          </button>
+          <button data-id="${folha.id}" class="btn btn-error">
+            <i class="fa fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+      });
+    } else {
+      linha = `<tr><td colspan="5" align="center">Nenhum registro encontrado.</td></tr>`;
+    }
+    setarHTML('tabela_dados', linha);
+  }
+  async function Excluir(id_folha) {
+    const resposta = await ExcluirDados(`/folhas/excluir/${id_folha}/`);
+  }
+</script>
+{% endblock %}

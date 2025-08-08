@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="item-centro">
+
+    <div style="min-width: 200px; max-width: 600px; width: 500px;">
+
+        <h2 style="margin-bottom: 20px;text-align: center;">Sistema de Emissor de Folha de Ponto</h2>
+        <div class="tabs w-100" style="min-height: 400px;">
+            <ul class="tab-nav">
+                <li class="active" style="width: 100%; text-align: center;" data-tab="tab1"><i class="fa fa-sign-in"
+                        aria-hidden="true"></i> Login</li>
+                <li data-tab="tab2" style="width: 100%; text-align: center;"><i class="fa fa-address-card"
+                        aria-hidden="true"></i> Cadastro</li>
+
+            </ul>
+            <div class="tab-content active" id="tab1">
+                <form method="post" action="{% url 'efetuar_login' %}">
+                    {% csrf_token %}
+                    <label for="txtEmail">Usuário</label>
+                    <input type="email" class="form-control" id="txtEmail" name="txtEmail"
+                        placeholder="Informe seu usuário" required>
+                    <br>
+                    <label for="txtSenha">Senha</label>
+                    <input type="password" class="form-control" id="txtSenha" name="txtSenha"
+                        placeholder="Informe sua senha" required>
+                    <br>
+                    <div class="row item-centro">
+                        <div class="col-sm-12 item-direita">
+                            Manter conectado?
+                            <label class="switch item-centro mt-2 ml-2">
+                                <input type="checkbox" id="txtServidorEmPGD">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-default form-control mt-3"><i class="fa fa-sign-in"
+                            aria-hidden="true"></i> ACESSAR</button>
+
+                    <!--
+                    <div class="item-centro mt-3">
+                        <a href="{% url 'social:begin' 'google-oauth2' %}" style="text-align: center;"
+                            class="google-btn form-control item-centro">
+                            <img class="google-icon"
+                                src="https://www.citypng.com/public/uploads/preview/google-logo-icon-gsuite-hd-701751694791470gzbayltphh.png"
+                                alt="Google logo">
+                            Entrar com Google
+                        </a>
+                    </div>   
+                   -->
+
+                    <div class="item-centro">
+                        {% if messages %}
+                        <ul>
+                            {% for message in messages %}
+                            <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    <br>
+                </form>
+            </div>
+            <div class="tab-content" id="tab2">
+                <form id="formCadastro">
+                    {% csrf_token %}
+                    <input type="text" id="txtCampusNome" name="txtCampusNome" class="form-control" required
+                        placeholder="Instituto Federal do Maranhão Campus Buriticupu">
+                    <br>
+                    <input type="text" id="txtCampusSigla" name="txtCampusSigla" class="form-control" required
+                        placeholder="BTC">
+                    <br>
+                    <label for="txtCampusLogo">Logo</label>
+                    <input type="file" id="txtCampusLogo" name="txtCampusLogo" class="form-control" required>
+                    <br>
+                    <input type="text" id="txtCampusNomeUsuario" name="txtCampusNomeUsuario" class="form-control"
+                        required placeholder="Informe o seu nome completo">
+                    <br>
+                    <input type="email" id="txtCampusEmailUsuario" name="txtCampusEmailUsuario" class="form-control"
+                        required placeholder="Informe seu endereço de e-mail">
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <input type="password" id="txtCampusSenhaUsuario" name="txtCampusSenhaUsuario"
+                                class="form-control" required placeholder="Informe uma senha">
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="password" id="txtCampusConfirmacaoSenhaUsuario"
+                                name="txtCampusConfirmacaoSenhaUsuario" class="form-control" required
+                                placeholder="Confirme sua senha">
+                        </div>
+                    </div>
+                    <br>
+                    <button type="button" class="btn btn-default form-control" onclick="Cadastrar()"><i
+                            class="fa fa-address-card" aria-hidden="true"></i> CADASTRAR</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="loadingSpinner" class="loading-spinner-container" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+</body>
+<script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/scripts.js' %}"></script>
+<script>
+    async function Cadastrar() {
+
+        const campusNome = obterElemento('txtCampusNome');
+        const campusSigla = obterElemento('txtCampusSigla');
+        const campusLogo = obterElemento('txtCampusLogo');
+        const campusNomeUsuario = obterElemento('txtCampusNomeUsuario');
+        const campusEmailUsuario = obterElemento('txtCampusEmailUsuario');
+        const campusSenhaUsuario = obterElemento('txtCampusSenhaUsuario');
+        const campusConfirmacaoSenhaUsuario = obterElemento('txtCampusConfirmacaoSenhaUsuario');
+
+        const campos = [campusNome, campusSigla, campusLogo, campusNomeUsuario, campusEmailUsuario, campusSenhaUsuario, campusConfirmacaoSenhaUsuario];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('nome', campusNome.value.toUpperCase());
+        formData.append('sigla', campusSigla.value.toUpperCase());
+        formData.append('logo', campusLogo.files[0]);
+        formData.append('nomeUsuario', campusNomeUsuario.value.toUpperCase());
+        formData.append('emailUsuario', campusEmailUsuario.value.toLowerCase());
+        formData.append('senhaUsuario', campusSenhaUsuario.value);
+        formData.append('confirmacaoSenhaUsuario', campusConfirmacaoSenhaUsuario.value);
+
+        const resposta = await InserirDados(`/cadastrar/usuario/`, formData, false);
+        const msg = resposta.mensagem;
+
+        if (resposta.status === 'sucesso') {
+            alert(`✔️ ${msg}`);
+            limparFormulario('formCadastro');
+        } else {
+            alert(`❌ ${msg}`);
+        }
+    }
+</script>
+
+</html>
