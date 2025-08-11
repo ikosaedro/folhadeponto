@@ -58,6 +58,9 @@ folhadeponto/
 3. Impressão da Folha de Ponto
 <img width="1918" height="1021" alt="image" src="https://github.com/user-attachments/assets/9bc445d7-1bf5-41f4-9df9-db16d02f6ab0" />
 
+4. Folha de Ponto quando servidor está afastado
+<img width="1915" height="954" alt="image" src="https://github.com/user-attachments/assets/1c4fa1b9-a7b4-4f90-a235-fae8c9a052d1" />
+
 
 
 
