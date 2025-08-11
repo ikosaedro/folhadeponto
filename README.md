@@ -7,12 +7,10 @@ O **Sistema de Emissão de Folha de Ponto** é uma aplicação desenvolvida na L
 > 🆓 Este projeto é **público**. Use, modifique e adapte conforme a sua necessidade.
 
 ## 🚀 Funcionalidades
+- Abandone o uso de malas diretas do MS Word.
 - Cadastros Gerais: Carreiras, Funções, Áreas, Cargos, Servidores, Afastamentos e etc.
 - Emissão da Folha de Ponto: Imprima direto ou Exporte para PDF, customização da Folha para Servidores afastados.
 - Dashboard da Distribuição de Servidores por Careiras, Se Em PGD?, Se Afastado?, Tipo (Efetivo ou Contratato).
-- Exportação de relatórios em PDF.
-- Cadastro e gerenciamento de funcionários.
-- Interface simples e intuitiva.
 
 ## 🛠️ Tecnologias Utilizadas
 - **Linguagens:** Python, HTML, CSS e Javascript
