@@ -49,5 +49,9 @@ folhadeponto/
 2. Cria Folha de Ponto para o Setor
 <img width="1876" height="925" alt="image" src="https://github.com/user-attachments/assets/b34db6e1-ce9b-4a49-83d0-383f296c8c6d" />
 
+3. Impressão da Folha de Ponto
+<img width="1918" height="1021" alt="image" src="https://github.com/user-attachments/assets/9bc445d7-1bf5-41f4-9df9-db16d02f6ab0" />
+
+
 
 
