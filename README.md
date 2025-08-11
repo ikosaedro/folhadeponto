@@ -36,3 +36,18 @@ folhadeponto/
 ├── urls.py
 └── views.py
 
+# View Dashboard
+<img width="1836" height="917" alt="image" src="https://github.com/user-attachments/assets/0d72b2a3-e4cf-4432-a4ba-7e1448262f2a" />
+
+# View Servidores
+<img width="1876" height="925" alt="image" src="https://github.com/user-attachments/assets/d7a42690-e040-4a51-8724-a766370e03b3" />
+
+# View Folhas
+1. Folhas de Ponto Criadas do Setor
+<img width="1876" height="925" alt="image" src="https://github.com/user-attachments/assets/1e4207de-bd37-4f3c-860f-68f72bb760e6" />
+
+2. Cria Folha de Ponto para o Setor
+<img width="1876" height="925" alt="image" src="https://github.com/user-attachments/assets/b34db6e1-ce9b-4a49-83d0-383f296c8c6d" />
+
+
+
