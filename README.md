@@ -15,7 +15,7 @@ O **Sistema de Emissão de Folha de Ponto** é uma aplicação desenvolvida na L
 ## 🛠️ Tecnologias Utilizadas
 - **Linguagens:** Python, HTML, CSS e Javascript
 - **Banco de Dados:** MySQL 
-- **Interface:** Aplicativo Web (FrameWord Django)
+- **Interface:** Aplicativo Web (Framework Django)
 
 ## 📂 Estrutura do Projeto
 
