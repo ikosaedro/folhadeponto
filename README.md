@@ -36,6 +36,12 @@ folhadeponto/
 ├── urls.py
 └── views.py
 
+# View Login/Cadastro de Instituição
+1. Login
+<img width="1876" height="925" alt="image" src="https://github.com/user-attachments/assets/714a0786-b329-4d84-87a8-9c5eecf8372f" />
+2. Cadastro de Instituição
+<img width="1876" height="925" alt="image" src="https://github.com/user-attachments/assets/7afec24b-e949-45ed-9bc3-2d95f5e33954" />
+
 # View Dashboard
 <img width="1836" height="917" alt="image" src="https://github.com/user-attachments/assets/0d72b2a3-e4cf-4432-a4ba-7e1448262f2a" />
 
