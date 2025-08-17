@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.models import User
 from folhadeponto.models import Campus, Usuario, Servidor
 from folhadeponto.utilitarios import acoes

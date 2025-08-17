@@ -1,11 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
-
-from django.http import HttpResponse, HttpResponseNotAllowed
-from django.http import JsonResponse
-from django.template import loader
+from django.shortcuts import render
 from folhadeponto.models import Data
 from folhadeponto.utilitarios import acoes
 

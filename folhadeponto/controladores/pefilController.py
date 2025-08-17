@@ -1,15 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render
 
-from django.http import HttpResponse, HttpResponseNotAllowed
-from django.http import JsonResponse
-from django.template import loader
-from folhadeponto.models import Area,  Servidor, Setor, Usuario
+
+from folhadeponto.models import  Setor
 from folhadeponto.utilitarios import acoes
-from django.db import models
-from django.db.models import Count, Q, OuterRef, Subquery
+from django.db.models import Count
 
 
 def ver_perfil(request):

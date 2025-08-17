@@ -49,8 +49,8 @@ AUTHENTICATION_BACKENDS = (
 
 
 # Credenciais do Google
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '450561149989-i4b8utri9mpfjme95bb9las6vhud648p.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '*'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '*'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
 # ✅ Desabilita criação automática de usuários
 SOCIAL_AUTH_PIPELINE = (
