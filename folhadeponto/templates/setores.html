@@ -1,0 +1,242 @@
+{% extends "master.html" %}
+
+{% block title %}
+Setores
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-sm-5">
+      <label for="txtNomeSetor">Setor</label>
+      <input type="text" placeholder="Diretoria de Administração e Planejamento" class="form-control upper"
+        id="txtNomeSetor">
+    </div>
+    <div class="col-sm-2">
+      <label for="txtSiglaSetor">Sigla</label>
+      <input type="text" placeholder="DAP" class="form-control upper" id="txtSiglaSetor">
+    </div>
+    <div class="col-sm-4">
+      <label for="txtResponsavelSetor">Responsável</label>
+      <select class="w-100" id="txtResponsavelSetor">
+        <option value="0" selected disabled>---</option>
+        {% for servidor in servidores %}
+        <option value="{{ servidor.id }}">{{ servidor.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-sm-1 item-centro">
+      <br>
+      <button type="button" class="btn btn-default mt-4 form-control" onclick="Inserir()">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <label for="">Listagem de Setores</label>
+  <div class="row">
+    <div class="col-sm-5 item-direita">
+      <input type="text" id="txtNomeSiglaSetorPesquisar" class="form-control w-100"
+        placeholder="Informe o nome ou a sigla do setor">
+    </div>
+    <div class="col-sm-5 item-direita">
+      <select class="w-100" id="txtResponsavelSetorPesquisar">
+        <option value="" selected>Responsável</option>
+        {% for servidor in servidores %}
+        <option value="{{ servidor.id }}">{{ servidor.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-1 item-centro">
+      <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+          aria-hidden="true"></i></button>
+    </div>
+    <div class="col-sm-1 item-centro">
+      <button class="btn btn-default form-control" onclick="location.reload();"><i class="fa fa-refresh"
+          aria-hidden="true"></i></button>
+    </div>
+    <div class="col-sm-12">
+      <table class="table tabela-customizada" id="tabela_Setors">
+        <thead>
+          <tr align="left">
+            <th>#</th>
+            <th>Nome</th>
+            <th>Sigla</th>
+            <th>Responsável</th>
+            <th>Nº servidores</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tabela_dados">
+          {% for setor in setores %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{ setor.nome }}</td>
+            <td>{{ setor.sigla }}</td>
+            <td>{{ setor.responsavel__nome|default:"-" }}</td>
+            <td>{{ setor.num_servidores }}</td>
+            <td align="center">
+              <button data-id="{{ setor.id }}" class="btn btn-default"
+                onclick="abrir('modalEditarSetor'); Obter(this.dataset.id); setarDataId('btnEditar',this.dataset.id)">
+                <i class="fa fa-edit"></i>
+              </button>
+
+              <button data-id="{{ setor.id }}" class="btn btn-error"
+                onclick="abrir('modalExcluirSetor'); setarDataId('btnExcluir', this.dataset.id)">
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<div id="modalEditarSetor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Editar Setor</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalEditarSetor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <label for="txtNomeSetorEditar">Nome</label>
+    <input type="text" id="txtNomeSetorEditar" class="form-control">
+    <label for="txtSiglaSetorEditar">Sigla</label>
+    <input type="text" id="txtSiglaSetorEditar" class="form-control">
+
+    <label for="txtResponsavelSetorEditar">Responsável</label>
+    <select class="w-100" id="txtResponsavelSetorEditar">
+      <option value="" selected>---</option>
+      {% for servidor in servidores %}
+      <option value="{{ servidor.id }}">{{ servidor.nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarSetor')">Cancelar</button>
+    <button class="btn btn-success" id="btnEditar" onclick="Editar(this.dataset.id)"><i class="fa fa-pencil-square-o"
+        aria-hidden="true"></i> Confirmar</button>
+  </div>
+</div>
+<div id="modalEditarSetorBackdrop" class="modal-backdrop"></div>
+
+<div id="modalExcluirSetor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Excluir Setor</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalExcluirSetor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <p>Deseja realmente excluir?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirSetor')">Cancelar</button>
+    <button class="btn btn-error" id="btnExcluir" onclick="Excluir(this.dataset.id)">
+      <i class="fa fa-trash"></i> Confirmar</button>
+  </div>
+</div>
+<div id="modalExcluirSetorBackdrop" class="modal-backdrop"></div>
+
+<script>
+  async function Inserir() {
+
+    const nomeSetor = obterElemento('txtNomeSetor');
+    const siglaSetor = obterElemento('txtSiglaSetor');
+    const idResponsavelSetor = obterElemento('txtResponsavelSetor');
+
+    const campos = [nomeSetor, siglaSetor, idResponsavelSetor];
+
+    if (algumCampoVazio(campos)) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const formData = new FormData()
+    const valor = (idResponsavelSetor.value == null || idResponsavelSetor.value === '0') ? '' : idResponsavelSetor.value
+    formData.append('responsavel_id', valor);
+    formData.append('nome', nomeSetor.value.toUpperCase());
+    formData.append('sigla', siglaSetor.value.toUpperCase());
+
+    const resposta = await InserirDados('/setores/adicionar', formData);
+  }
+  async function Obter(id_setor) {
+    const resposta = await ObterDados(`/setores/obter/${id_setor}/`);
+    if (resposta.dados) {
+      setarValor('txtNomeSetorEditar', resposta.dados.nome);
+      setarValor('txtSiglaSetorEditar', resposta.dados.sigla);
+      if (resposta.dados.responsavel__id) {
+        setarValor('txtResponsavelSetorEditar', resposta.dados.responsavel__id);
+      }
+    }
+  }
+  async function Editar(id_setor) {
+
+    const responsavelSetor = obterElemento('txtResponsavelSetorEditar');
+    const nomeSetor = obterElemento('txtNomeSetorEditar');
+    const siglaSetor = obterElemento('txtSiglaSetorEditar');
+
+    const campos = [nomeSetor, siglaSetor];
+
+    if (algumCampoVazio(campos)) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const formData = new FormData()
+    formData.append('responsavel_id', responsavelSetor.value || '');
+    formData.append('nome', nomeSetor.value.toUpperCase());
+    formData.append('sigla', siglaSetor.value.toUpperCase());
+
+    const resposta = await EditarDados(`/setores/editar/${id_setor}/`, formData);
+  }
+  async function Excluir(id_setor) {
+    const resposta = await ExcluirDados(`/setores/excluir/${id_setor}/`);
+  }
+  async function Pesquisar() {
+
+  const txtNomeSiglaSetorPesquisar = obterElemento('txtNomeSiglaSetorPesquisar');
+  const txtResponsavelSetorPesquisar = obterElemento('txtResponsavelSetorPesquisar');
+
+  const nomeSigla = encodeURIComponent(txtNomeSiglaSetorPesquisar.value.trim());
+  const responsavel = encodeURIComponent(txtResponsavelSetorPesquisar.value.trim());
+
+  const url = `/setores/pesquisar/?responsavel=${responsavel}&nomeSigla=${nomeSigla}`;
+
+  const resultado = await PesquisarDados(url);
+  let linha = '';
+
+  if (resultado.dados) {
+    resultado.dados.forEach((setor, index) => {
+      linha += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${setor.nome}</td>
+          <td>${setor.sigla}</td>
+          <td>${setor.responsavel__nome || '-'}</td>
+          <td>${setor.num_servidores}</td>
+          <td align="center">
+            <button data-id="${setor.id}" class="btn btn-default"
+              onclick="abrir('modalEditarSetor'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button data-id="${setor.id}" class="btn btn-error"
+              onclick="abrir('modalExcluirSetor'); setarDataId('btnExcluir', this.dataset.id)">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  } else {
+    linha = `<tr><td colspan="6" align="center">Nenhum registro encontrado.</td></tr>`;
+  }
+  setarHTML('tabela_dados', linha);
+}
+</script>
+
+{% endblock %}

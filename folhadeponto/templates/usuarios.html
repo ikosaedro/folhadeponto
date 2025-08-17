@@ -1,0 +1,274 @@
+{% extends "master.html" %}
+
+{% block title %}
+Usuários do Sistema
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-8">
+            <label for="txtServidorUsuario">Servidor</label>
+            <select class="w-100" id="txtServidorUsuario">
+                <option value="" selected disabled>---</option>
+                {% for servidor in servidores %}
+                <option value="{{ servidor.id }}">{{ servidor.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <label for="txtTipoUsuario">Tipo de usuário</label>
+            <select class="w-100" id="txtTipoUsuario">
+                <option value="" selected disabled>---</option>
+                <option value="0">COORDENADOR DE SETOR</option>
+                <option value="1">GESTÃO DE PESSOAS</option>
+            </select>
+        </div>
+        <div class="col-sm-5">
+            <label for="txtEmailUsuario">E-mail</label>
+            <input type="email" class="form-control" id="txtEmailUsuario" required placeholder="Endereço de e-mail">
+        </div>
+        <div class="col-sm-3">
+            <label for="txtSenhaUsuario">Senha</label>
+            <input type="password" class="form-control" id="txtSenhaUsuario" required placeholder="Informe a senha">
+        </div>
+        <div class="col-sm-3">
+            <label for="txtConfirmacaoSenhaUsuario">Confirmação de senha</label>
+            <input type="password" class="form-control" id="txtConfirmacaoSenhaUsuario" required
+                placeholder="Confirme sua senha">
+        </div>
+
+        <div class="col-sm-1 mt-2">
+            <button type="button" class="btn btn-default mt-4 form-control" onclick="Inserir()">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <label>Listagem de Usuarios</label>
+    <div class="row">
+        <div class="col-sm-5">
+            <input type="text" class="form-control" id="txtUsuarioPesquisar" required
+                placeholder="Informe o usuário ou e-mail">
+        </div>
+
+        <div class="col-sm-3">
+            <select class="w-100" id="txtTipoUsuarioPesquisar">
+                <option value="" selected>tipo</option>
+                <option value="0">COORDENADOR DE SETOR</option>
+                <option value="1">GESTÃO DE PESSOAS</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <select class="w-100" id="txtStatusUsuarioPesquisar">
+                <option value="" selected>Status</option>
+                <option value="1">ATIVO</option>
+                <option value="0">INATIVO</option>
+            </select>
+        </div>
+        <div class="col-sm-1">
+            <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-1">
+            <button class="btn btn-default form-control" onclick="location.reload();"><i class="fa fa-refresh"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-12">
+            <table class="table tabela-customizada" id="tabela_Cargos">
+                <thead>
+                    <tr align="left">
+                        <th>#</th>
+                        <th>Usuário</th>
+                        <th>E-mail</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Data cadastro</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tabela_dados">
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{usuario.user__username}}</td>
+                        <td>{{usuario.user__email}}</td>
+                        <td>{% if usuario.user__is_superuser %}
+                            GESTÃO DE PESSOAS
+                            {% else %}
+                            COORDENADOR DE SETOR
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if usuario.user__is_active %}
+                            ATIVO
+                            {% else %}
+                            INATIVO
+                            {% endif %}
+                        </td>
+                        <td>{{usuario.data_cadastro|date:"d/m/Y H:i" }}</td>
+                        <td align="center">
+                            <button class="btn btn-default" data-id="{{ usuario.id }}"
+                                onclick="abrir('modalEditarUsuario'); Obter(this.dataset.id); setarDataId('btnEditar',this.dataset.id)">
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-error" data-id="{{ usuario.id }}"
+                                onclick="abrir('modalExcluirUsuario'); setarDataId('btnExcluir', this.dataset.id)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalEditarUsuario" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Editar Usuário</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalEditarUsuario')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <label for="txtNomeUsuarioEditar">Nome</label>
+        <input type="text" id="txtNomeUsuarioEditar" class="form-control" required>
+        <label for="txtEmailUsuarioEditar">E-mail</label>
+        <input type="email" id="txtEmailUsuarioEditar" class="form-control" required>
+        <label for="txtTipoUsuarioEditar">Tipo de usuário</label>
+        <select class="w-100" id="txtTipoUsuarioEditar">
+            <option value="" selected disabled>---</option>
+            <option value="0">COORDENADOR DE SETOR</option>
+            <option value="1">GESTÃO DE PESSOAS</option>
+        </select>
+        <label for="txtStatusUsuarioEditar">Status</label>
+        <select class="w-100" id="txtStatusUsuarioEditar">
+            <option value="" selected disabled>---</option>
+            <option value="1">ATIVO</option>
+            <option value="0">INATIVO</option>
+        </select>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarUsuario')">Cancelar</button>
+        <button class="btn btn-success" id="btnEditar" onclick="Editar(this.dataset.id)"><i
+                class="fa fa-pencil-square-o" aria-hidden="true"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalEditarUsuarioBackdrop" class="modal-backdrop"></div>
+
+<div id="modalExcluirUsuario" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Excluir Usuário</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalExcluirUsuario')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <p>Deseja realmente excluir?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirUsuario')">Cancelar</button>
+        <button class="btn btn-error" id="btnExcluir" onclick="Excluir(this.dataset.id)">
+            <i class="fa fa-trash"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalExcluirUsuarioBackdrop" class="modal-backdrop"></div>
+
+<script>
+    async function Inserir() {
+
+        const servidor = obterElemento('txtServidorUsuario');
+        const tipo = obterElemento('txtTipoUsuario');
+        const email = obterElemento('txtEmailUsuario');
+        const senha = obterElemento('txtSenhaUsuario');
+        const confirmacaoSenha = obterElemento('txtConfirmacaoSenhaUsuario');
+
+        const campos = [servidor, tipo, email, senha, confirmacaoSenha,];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+        const formData = new FormData()
+        formData.append('servidor', servidor.value);
+        formData.append('tipo', tipo.value);
+        formData.append('email', email.value);
+        formData.append('senha', senha.value);
+        formData.append('confirmacaoSenha', confirmacaoSenha.value);
+
+        const resposta = await InserirDados(`/usuarios/adicionar/`, formData);
+
+    }
+    async function Obter(id_usuario) {
+
+        const resposta = await ObterDados(`/usuarios/obter/${id_usuario}/`);
+        console.log(resposta);
+
+        if (resposta.dados) {
+            setarValor('txtNomeUsuarioEditar', resposta.dados.user__username);
+            setarValor('txtEmailUsuarioEditar', resposta.dados.user__email);
+            setarValor('txtTipoUsuarioEditar', resposta.dados.user__is_superuser ? '1' : '0');
+            setarValor('txtStatusUsuarioEditar', resposta.dados.user__is_active ? '1' : '0');
+        }
+    }
+    async function Editar(id_usuario) {
+
+        const nome = obterElemento('txtNomeUsuarioEditar');
+        const email = obterElemento('txtEmailUsuarioEditar');
+        const tipo = obterElemento('txtTipoUsuarioEditar');
+
+        const campos = [nome, email, tipo];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('nome', nome.value.toUpperCase());
+        formData.append('email', email.value.toLowerCase());
+        formData.append('tipo', tipo.value);
+        const resposta = await EditarDados(`/usuarios/editar/${id_usuario}/`, formData)
+    }
+    async function Excluir(id_usuario) {
+        const resposta = await ExcluirDados(`/usuarios/excluir/${id_usuario}/`)
+    }
+    async function Pesquisar() {
+
+        const txtNomeAreaPesquisar = obterElemento('txtNomeAreaPesquisar');
+        const nomeArea = encodeURIComponent(txtNomeAreaPesquisar.value.trim());
+
+        const url = `/areas/pesquisar/?nome=${nomeArea}`;
+        const resultado = await PesquisarDados(url);
+        let linha = '';
+
+        if (resultado.dados) {
+            resultado.dados.forEach((area, index) => {
+                linha += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${area.nome}</td>
+                    <td>${area.num_cargos}</td>
+                    <td>${area.num_servidores}</td>
+                    <td>${formatarDataHora(area.data_cadastro)}</td>
+                    <td align="center">
+                        <button class="btn btn-default" data-id="${area.id}"
+                        onclick="abrir('modalEditarArea'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-error" data-id="${area.id}"
+                        onclick="abrir('modalExcluirArea'); setarDataId('btnExcluir', this.dataset.id)">
+                        <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        } else {
+            linha = '<tr><td colspan="6" align="center">Nenhum registro encontrado.</td></tr>';
+        }
+        setarHTML('tabela_dados', linha);
+    }
+</script>
+{% endblock %}

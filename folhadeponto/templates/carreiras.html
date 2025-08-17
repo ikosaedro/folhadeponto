@@ -1,0 +1,187 @@
+{% extends "master.html" %}
+
+{% block title %}
+Setores
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <label for="txtNomeCarreira">Nova carreira</label>
+    <div class="row">
+        <div class="col-sm-11">
+            <input type="text" placeholder="Informe o nome da carreira" class="form-control upper" id="txtNomeCarreira">
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button type="button" class="btn btn-default form-control" onclick="Inserir()">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <label>Listagem de carreiras</label>
+    <div class="row">
+        <div class="col-sm-10">
+            <input id="txtNomeCarrreiraPesquisar" type="text" class="form-control w-100"
+                placeholder="Informe uma carreira">
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" onclick="location.reload()"><i class="fa fa-refresh"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-12">
+            <table class="table tabela-customizada" id="tabela_carreiras">
+                <thead>
+                    <tr align="left">
+                        <th>#</th>
+                        <th>Carreira</th>
+                        <th>Nº Cargos</th>
+                        <th>Nº servidores</th>
+                        <th>Data cadastro</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tabela_dados">
+                    {% for carreira in carreiras %}
+                    <tr id="linha_{{ carreira.id }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ carreira.nome }}</td>
+                        <td>{{ carreira.num_cargos }}</td>
+                        <td>{{ carreira.num_servidores }}</td>
+                        <td>{{ carreira.data_cadastro|date:"d/m/Y H:i" }}</td>
+                        <td align="center">
+                            <button class="btn btn-default" data-id="{{ carreira.id }}"
+                                onclick="abrir('modalEditarCarreira'); Obter(this.dataset.id); setarDataId('btnEditar',this.dataset.id)">
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-error" data-id="{{ carreira.id }}"
+                                onclick="abrir('modalExcluirCarreira'); setarDataId('btnExcluir', this.dataset.id)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalEditarCarreira" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Editar Carreira</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalEditarCarreira')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <label for="txtNomeCarreiraEditar">Nome da carreira</label>
+        <input type="text" id="txtNomeCarreiraEditar" class="form-control">
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarCarreira')">Cancelar</button>
+        <button class="btn btn-success" id="btnEditar" onclick="Editar(this.dataset.id)"><i
+                class="fa fa-pencil-square-o" aria-hidden="true"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalEditarCarreiraBackdrop" class="modal-backdrop"></div>
+
+<div id="modalExcluirCarreira" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Excluir Carreira</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalExcluirCarreira')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <p>Deseja realmente excluir?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirCarreira')">Cancelar</button>
+        <button class="btn btn-error" id="btnExcluir" onclick="Excluir(this.dataset.id)">
+            <i class="fa fa-trash"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalExcluirCarreiraBackdrop" class="modal-backdrop"></div>
+
+
+<script>
+    async function Inserir() {
+
+        const nomeCarreira = obterElemento('txtNomeCarreira');
+        const campos = [nomeCarreira];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+        const formData = new FormData()
+        formData.append('nome', nomeCarreira.value.toUpperCase());
+
+        const resposta = await InserirDados(`/carreiras/adicionar/`, formData);
+
+    }
+    async function Obter(id_carreira) {
+
+        const resposta = await ObterDados(`/carreiras/obter/${id_carreira}/`);
+
+        if (resposta.dados) {
+            setarValor('txtNomeCarreiraEditar', resposta.dados.nome);
+        }
+    }
+    async function Editar(id_carreira) {
+
+        const nomeCarreira = obterElemento('txtNomeCarreiraEditar');
+        const campos = [nomeCarreira];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('nome', nomeCarreira.value.toUpperCase());
+        const resposta = await EditarDados(`/carreiras/editar/${id_carreira}/`, formData)
+    }
+    async function Excluir(id_carreira) {
+        const resposta = await ExcluirDados(`/carreiras/excluir/${id_carreira}/`)
+    }
+    async function Pesquisar() {
+
+        const txtNomeCarrreiraPesquisar = obterElemento('txtNomeCarrreiraPesquisar');
+        const nomeCarreira = encodeURIComponent(txtNomeCarrreiraPesquisar.value.trim());
+
+        const url = `/carreiras/pesquisar/?nome=${nomeCarreira}`;
+        const resultado = await PesquisarDados(url);
+        let linha = '';
+
+        if (resultado.dados) {
+            resultado.dados.forEach((carreira, index) => {
+                linha += `
+                <tr id="linha_${carreira.id}">
+                    <td>${index + 1}</td>
+                    <td>${carreira.nome}</td>
+                    <td>${carreira.num_cargos}</td>
+                    <td>${carreira.num_servidores}</td>
+                    <td>${formatarDataHora(carreira.data_cadastro)}</td>
+                    <td align="center">
+                        <button class="btn btn-default" data-id="${carreira.id}"
+                        onclick="abrir('modalEditarCarreira'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-error" data-id="${carreira.id}"
+                        onclick="abrir('modalExcluirCarreira'); setarDataId('btnExcluir', this.dataset.id)">
+                        <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        } else {
+            linha = '<tr><td colspan="6" align="center">Nenhum registro encontrado.</td></tr>';
+        }
+        setarHTML('tabela_dados', linha);
+    }
+</script>
+{% endblock %}

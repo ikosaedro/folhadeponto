@@ -1,0 +1,285 @@
+{% extends "master.html" %}
+
+{% block title %}
+Cargos
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <label for="txtCarreira">Carreira</label>
+            <select class="w-100" id="txtCarreira">
+                <option value="0" selected disabled>---</option>
+                {% for carreira in carreiras %}
+                <option value="{{ carreira.id }}">{{ carreira.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-sm-6">
+            <label for="txtNivel">Nível</label>
+            <select class="w-100" id="txtNivel">
+                <option value="0" selected disabled>---</option>
+                <option value="ENSINO FUNDAMENTAL">ENSINO FUNDAMENTAL</option>
+                <option value="ENSINO MÉDIO">ENSINO MÉDIO</option>
+                <option value="ENSINO SUPERIOR">ENSINO SUPERIOR</option>
+            </select>
+        </div>
+
+        <div class="col-sm-6">
+            <label for="txtNomeCargo">Cargo</label>
+            <input type="text" placeholder="Informe o nome da Cargo" class="form-control upper" id="txtNomeCargo">
+        </div>
+        <div class="col-sm-5">
+            <label for="txtArea">Área</label>
+            <select class="w-100" id="txtArea">
+                <option value="0" selected disabled>---</option>
+                {% for area in areas %}
+                <option value="{{ area.id }}">{{ area.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div class="col-sm-1 item-centro">
+            <br>
+            <button type="button" class="btn btn-default mt-4 form-control" onclick="Inserir()">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <label>Listagem de Cargos</label>
+    <div class="row">
+        <div class="col-sm-4 item-esquerda">
+            <select class="w-100" id="txtCarreiraPesquisar">
+                <option value="" selected>Selecione uma carreira</option>
+                {% for carreira in carreiras %}
+                <option value="{{ carreira.id }}">{{ carreira.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-3 item-esquerda">
+            <select class="w-100" id="txtNivelPesquisar">
+                <option value="" selected>Selecione um nível</option>
+                <option value="ENSINO FUNDAMENTAL">ENSINO FUNDAMENTAL</option>
+                <option value="ENSINO MÉDIO">ENSINO MÉDIO</option>
+                <option value="ENSINO SUPERIOR">ENSINO SUPERIOR</option>
+            </select>
+        </div>
+        <div class="col-sm-3 item-direita">
+            <input type="text" class="form-control w-100" placeholder="Informe um cargo" id="txtNomeCargoPesquisar">
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" oncanplay="location.reload()"><i class="fa fa-refresh"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-12">
+            <table class="table tabela-customizada" id="tabela_Cargos">
+                <thead>
+                    <tr align="left">
+                        <th>#</th>
+                        <th>Carreira</th>
+                        <th>Cargo</th>
+                        <th>Área</th>
+                        <th>Nível</th>
+                        <th>Nº servidores</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tabela_dados">
+                    {% for cargo in cargos %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{cargo.carreira__nome}}</td>
+                        <td>{{cargo.nome}}</td>
+                        <td>{{cargo.area__nome}}</td>
+                        <td>{{cargo.nivel}}</td>
+                        <td>{{cargo.num_servidores}}</td>
+                        <td align="center">
+                            <button class="btn btn-default" data-id="{{cargo.id}}" onclick="abrir('modalEditarCargo'), 
+                                Obter(this.dataset.id); 
+                                setarDataId('btnEditarCargo', this.dataset.id)">
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                            </button>
+
+                            <button class="btn btn-error"
+                                onclick="abrir('modalExcluirCargo'), setarDataId('btnExcluirCargo', '{{cargo.id}}')"><i
+                                    class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div id="modalEditarCargo" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Editar Cargo</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalEditarCargo')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <label for="txtCarreiraEditar">Carreira</label>
+        <select class="w-100" id="txtCarreiraEditar">
+            <option value="0" selected disabled>---</option>
+            {% for carreira in carreiras %}
+            <option value="{{ carreira.id }}">{{ carreira.nome }}</option>
+            {% endfor %}
+        </select>
+        <label for="txtNomeCargoEditar">Nome da Cargo</label>
+        <input type="text" id="txtNomeCargoEditar" class="form-control">
+        <label for="txtAreaEditar">Área</label>
+        <select class="w-100" id="txtAreaEditar">
+            <option value="0" selected disabled>---</option>
+            {% for area in areas %}
+            <option value="{{ area.id }}">{{ area.nome }}</option>
+            {% endfor %}
+        </select>
+        <label for="txtNivelEditar">Nível</label>
+        <select class="w-100" id="txtNivelEditar">
+            <option value="0" selected disabled>---</option>
+            <option value="ENSINO FUNDAMENTAL">ENSINO FUNDAMENTAL</option>
+            <option value="ENSINO MÉDIO">ENSINO MÉDIO</option>
+            <option value="ENSINO SUPERIOR">ENSINO SUPERIOR</option>
+        </select>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarCargo')">Cancelar</button>
+        <button class="btn btn-success" id="btnEditarCargo" onclick="EditarCargo(this.dataset.id)"><i
+                class="fa fa-pencil-square-o" aria-hidden="true"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalEditarCargoBackdrop" class="modal-backdrop"></div>
+
+
+<div id="modalExcluirCargo" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Excluir Cargo</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalExcluirCargo')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <p>Deseja realmente excluir?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirCargo')">Cancelar</button>
+        <button class="btn btn-error" id="btnExcluirCargo" onclick="Excluir(this.dataset.id)"><i
+                class="fa fa-trash"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalExcluirCargoBackdrop" class="modal-backdrop"></div>
+
+
+<script>
+    async function Inserir() {
+
+        const idCarreira = obterElemento('txtCarreira');
+        const nomeCargo = obterElemento('txtNomeCargo');
+        const nivel = obterElemento('txtNivel');
+        const area = obterElemento('txtArea');
+
+        const campos = [idCarreira, nomeCargo, nivel, area];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('carreira_id', idCarreira.value)
+        formData.append('area_id', area.value)
+        formData.append('nome', nomeCargo.value.toUpperCase());
+        formData.append('nivel', nivel.value);
+        const resposta = await InserirDados('/cargos/adicionar', formData);
+    }
+    async function Obter(id_cargo) {
+        const resposta = await ObterDados(`/cargos/obter/${id_cargo}/`);
+        if (resposta.dados) {
+            setarValor('txtNomeCargoEditar', resposta.dados.nome);
+            setarValor('txtCarreiraEditar', resposta.dados.carreira__id);
+            setarValor('txtNivelEditar', resposta.dados.nivel);
+            setarValor('txtAreaEditar', resposta.dados.area__id);
+        }
+    }
+    async function Editar(id_cargo) {
+
+        const idCarreira = obterElemento('txtCarreiraEditar');
+        const nomeCargo = obterElemento('txtNomeCargoEditar');
+        const nivel = obterElemento('txtNivelEditar');
+        const area = obterElemento('txtAreaEditar');
+
+        const campos = [idCarreira, nomeCargo, nivel, area];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('carreira_id', idCarreira.value)
+        formData.append('area_id', area.value)
+        formData.append('nome', nomeCargo.value.toUpperCase());
+        formData.append('nivel', nivel.value);
+
+        const resposta = await EditarDados(`/cargos/editar/${id_cargo}/`);
+    }
+    async function Excluir(id_cargo) {
+        const resposta = await ExcluirDados(`/cargos/excluir/${id_cargo}/`);
+    }
+    async function Pesquisar() {
+
+        const txtCarreiraPesquisar = obterElemento('txtCarreiraPesquisar');
+        const txtNivelPesquisar = obterElemento('txtNivelPesquisar');
+        const txtNomeCargoPesquisar = obterElemento('txtNomeCargoPesquisar')
+
+        const carreira = encodeURIComponent(txtCarreiraPesquisar.value.trim());
+        const nivelCargo = encodeURIComponent(txtNivelPesquisar.value.trim());
+        const nomeCargo = encodeURIComponent(txtNomeCargoPesquisar.value.trim());
+
+        const url = `/cargos/pesquisar/?nome=${nomeCargo}&nivel=${nivelCargo}&carreira=${carreira}`;
+
+        const resposta = await PesquisarDados(url);
+        let linha = ''
+        if (resposta.dados) {
+            resposta.dados.forEach((cargo, index) => {
+                linha += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${cargo.carreira__nome || '-'}</td>
+                <td>${cargo.nome}</td>
+                <td>${cargo.nivel || '-'}</td>
+                <td>${cargo.num_servidores}</td>
+                <td align="center">
+                    <button class="btn btn-default" data-id="${cargo.id}" onclick="abrir('modalEditarCargo'); 
+                        Obter(this.dataset.id); 
+                        setarDataId('btnEditarCargo', this.dataset.id)">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                    </button>
+                    <button class="btn btn-error" data-id="${cargo.id}"
+                        onclick="abrir('modalExcluirCargo'); setarDataId('btnExcluirCargo', this.dataset.id)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+            });
+        } else {
+            linha = `<tr><td colspan="6" align="center">Nenhum registro encontrado.</td></tr>`;
+        }
+        setarHTML('tabela_dados', linha);
+    }
+</script>
+{% endblock %}

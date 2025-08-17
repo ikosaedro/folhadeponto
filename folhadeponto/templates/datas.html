@@ -1,0 +1,348 @@
+{% extends "master.html" %}
+
+{% block title %}
+Feriados
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-5">
+            <label for="txtDescricaoData">Descrição</label>
+            <input type="text" class="form-control upper" id="txtDescricaoData">
+        </div>
+        <div class="col-sm-2">
+            <label for="txtDiaData">Nova data</label>
+            <input type="date" class="form-control upper" id="txtDiaData">
+        </div>
+        <div class="col-sm-2">
+            <label for="txtTidoData">Tipo</label>
+            <select class="w-100" id="txtTipoData">
+                <option value="0">NÃO LETIVO</option>
+                <option value="1">LETIVO</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <label for="txtAbrangenciaData">Abragência</label>
+            <select class="w-100" id="txtAbrangenciaData">
+                <option value="MUNICIPAL">MUNICIPAL</option>
+                <option value="ESTADUAL">ESTADUAL</option>
+                <option value="NACIONAL">NACIONAL</option>
+            </select>
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button type="submit" class="btn btn-default form-control mt-4" onclick="Inserir()">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-success" onclick="ObterFeriados();"><i class="fa fa-calendar"
+                    aria-hidden="true"></i> Obter Feridos Nacionais do Ano</button>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <label>Listagem de Datas</label>
+    <div class="row">
+        <div class="col-sm-3 item-direita">
+            <input type="date" class="form-control w-100" id="txtDataPesquisar">
+        </div>
+        <div class="col-sm-3 item-direita">
+            <input type="text" class="form-control w-100" id="txtDescricaoDataPesquisar"
+                placeholder="Informe uma descrição">
+        </div>
+        <div class="col-sm-2">
+            <select class="w-100" id="txtTidoDataPesquisar">
+                <option value="">Tipo</option>
+                <option value="0">NÃO LETIVO</option>
+                <option value="1">LETIVO</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <select class="w-100" id="txtAbrangenciaDataPesquisar">
+                <option value="">Abrangência</option>
+                <option value="MUNICIPAL">MUNICIPAL</option>
+                <option value="ESTADUAL">ESTADUAL</option>
+                <option value="NACIONAL">NACIONAL</option>
+            </select>
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-1 item-centro">
+            <button class="btn btn-default form-control" onclick="location.reload()"><i class="fa fa-refresh"
+                    aria-hidden="true"></i></button>
+        </div>
+        <div class="col-sm-12">
+            <table class="table tabela-customizada" id="tabela_datas">
+                <thead>
+                    <tr align="left">
+                        <th>#</th>
+                        <th>Descrição</th>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Abrângência</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </thead>
+                <tbody id="tabela_dados">
+                    {% for data in datas %}
+
+                    <tr>
+                        <td>{{ forloop.counter}}</td>
+                        <td>{{ data.nome}}</td>
+                        <td>{{ data.data|date:"d/m/Y"}}</td>
+                        <td>{% if data.tipo == "1" %}
+                            LETIVO
+                            {% else %}
+                            NÃO LETIVO
+                            {% endif %}
+                        </td>
+                        <td>{{ data.abrangencia}}</td>
+                        <td align="center">
+                            <button data-id="{{data.id}}" class="btn btn-default"
+                                onclick="abrir('modalEditarData'); Obter(this.dataset.id); setarDataId('btnEditarData', this.dataset.id)">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button data-id="{{data.id}}" class="btn btn-error"
+                                onclick="abrir('modalExcluirData'); setarDataId('btnExcluirData', this.dataset.id)">
+                                <i class="fa fa-trash"></i></button>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalEditarData" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Editar Data</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalEditarData')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <label for="txtDescricaoDataEditar">Descrição</label>
+        <input type="text" id="txtDescricaoDataEditar" class="form-control">
+
+        <label for="txtDiaDataEditar">Data</label>
+        <input type="date" id="txtDiaDataEditar" class="form-control">
+
+        <label for="txtTipoDataEditar">Tipo</label>
+        <select class="w-100" id="txtTipoDataEditar">
+            <option value="0">NÃO LETIVO</option>
+            <option value="1">LETIVO</option>
+        </select>
+        <label for="txtAbrangenciaDataEditar">Tipo</label>
+        <select class="w-100" id="txtAbrangenciaDataEditar">
+            <option value="MUNICIPAL">MUNICIPAL</option>
+            <option value="ESTADUAL">ESTADUAL</option>
+            <option value="NACIONAL">NACIONAL</option>
+        </select>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarData')">Cancelar</button>
+        <button class="btn btn-success" id="btnEditarData" onclick="Editar(this.dataset.id)"><i
+                class="fa fa-pencil-square-o" aria-hidden="true"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalEditarDataBackdrop" class="modal-backdrop"></div>
+
+<div id="modalExcluirData" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Excluir Data</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalExcluirData')">&times;</button>
+    </div>
+    <div class="modal-body">
+        <p>Deseja realmente excluir?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirData')">Cancelar</button>
+        <button class="btn btn-error" id="btnExcluirData" onclick="Excluir(this.dataset.id)">
+            <i class="fa fa-trash"></i> Confirmar</button>
+    </div>
+</div>
+<div id="modalExcluirDataBackdrop" class="modal-backdrop"></div>
+
+<div id="modalFeriados" class="modal" tabindex="-1">
+    <div class="modal-header">
+        <h2 id="modalTitulo" class="modal-title">Feriados Nacionais</h2>
+        <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+            onclick="fechar('modalFeriados')">&times;</button>
+    </div>
+    <div class="modal-body">
+
+        <table class="table tabela-customizada" id="tabela_datas">
+            <thead>
+                <tr align="left">
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th hidden='true'>Data</th>
+                    <th>Data</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="tabela_dados_feriados">
+
+            </tbody>
+        </table>
+
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default modal-fechar" onclick="fechar('modalFeriados')">Fechar</button>
+    </div>
+</div>
+<div id="modalFeriadosBackdrop" class="modal-backdrop"></div>
+
+
+<script>
+    async function Inserir() {
+
+        const descricaoData = obterElemento('txtDescricaoData');
+        const diaData = obterElemento('txtDiaData');
+        const tipoData = obterElemento('txtTipoData');
+        const abrangenciaData = obterElemento('txtAbrangenciaData');
+
+        const campos = [descricaoData, diaData, tipoData, abrangenciaData];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+        const formData = new FormData()
+        formData.append('nome', descricaoData.value.toUpperCase());
+        formData.append('data', diaData.value);
+        formData.append('tipo', tipoData.value);
+        formData.append('abrangencia', abrangenciaData.value);
+
+        const resposta = await InserirDados('/datas/adicionar/', formData);
+
+    }
+
+    async function InserirFeriado(id_linha) {
+
+        const tipoData = obterElemento('txtTipoData');
+        const formData = new FormData()
+        formData.append('nome', obterValorCelula(id_linha, 1));
+        formData.append('data', obterValorCelula(id_linha, 2));
+        formData.append('tipo', tipoData.value);
+        formData.append('abrangencia', 'NACIONAL');
+        const resposta = await InserirDados('/datas/adicionar/', formData, false);
+
+        if (resposta.status === 'sucesso') {
+            Pesquisar();
+        }
+    }
+
+
+    async function Obter(id_data) {
+
+        const resposta = await ObterDados(`/datas/obter/${id_data}/`);
+        if (resposta.dados) {
+            setarValor('txtDescricaoDataEditar', resposta.dados.nome);
+            setarValor('txtDiaDataEditar', resposta.dados.data);
+            setarValor('txtTipoDataEditar', resposta.dados.tipo);
+            setarValor('txtAbrangenciaDataEditar', resposta.dados.abrangencia);
+        }
+    }
+    async function ObterFeriados() {
+        const resposta = await ObterFeriadosNacionais();
+        let linha = '';
+        if (resposta) {
+            console.log(resposta);
+
+            resposta.forEach((feriado, index) => {
+                let id_linha = index + 1
+                linha += `
+                        <tr id="linha_${id_linha}" style="font-size: xx-small;">
+                            <td>${id_linha}</td>
+                            <td>${feriado.name}</td>
+                            <td hidden='true'>${feriado.date}</td>
+                            <td>${formatarData(feriado.date)} (${obterDiaDaSemana(feriado.date)})</td>
+                            <td>
+                                <button  class="btn btn-default" onclick="InserirFeriado('linha_${id_linha}')">
+                                  <i class="fa fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </td>
+                        </tr>`});
+            setarHTML('tabela_dados_feriados', linha);
+            abrir('modalFeriados');
+        }
+    }
+    async function Editar(id_data) {
+
+        const descricaoData = obterElemento('txtDescricaoDataEditar');
+        const diaData = obterElemento('txtDiaDataEditar');
+        const tipoData = obterElemento('txtTipoDataEditar');
+        const abrangenciaData = obterElemento('txtAbrangenciaDataEditar');
+
+        const campos = [descricaoData, diaData, tipoData, abrangenciaData];
+
+        if (algumCampoVazio(campos)) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('nome', descricaoData.value.toUpperCase());
+        formData.append('data', diaData.value);
+        formData.append('tipo', tipoData.value);
+        formData.append('abrangencia', abrangenciaData.value);
+
+        const resposta = await EditarDados(`/datas/editar/${id_data}/`, formData)
+    }
+    async function Excluir(id_data) {
+        const resposta = await ExcluirDados(`/datas/excluir/${id_data}/`)
+    }
+    async function Pesquisar() {
+
+        const txtDataPesquisar = obterElemento('txtDataPesquisar');
+        const txtDescricaoDataPesquisar = obterElemento('txtDescricaoDataPesquisar');
+        const txtTidoDataPesquisar = obterElemento('txtTidoDataPesquisar');
+        const txtAbrangenciaDataPesquisar = obterElemento('txtAbrangenciaDataPesquisar');
+
+        const data = encodeURIComponent(txtDataPesquisar.value.trim());
+        const descricao = encodeURIComponent(txtDescricaoDataPesquisar.value.trim());
+        const tipo = encodeURIComponent(txtTidoDataPesquisar.value.trim());
+        const abrangencia = encodeURIComponent(txtAbrangenciaDataPesquisar.value.trim());
+
+        const url = `/datas/pesquisar/?data=${data}&descricao=${descricao}&tipo=${tipo}&abrangencia=${abrangencia}`;
+        const resposta = await PesquisarDados(url);
+        let linha = '';
+
+        if (resposta.dados) {
+            resposta.dados.forEach((data, index) => {
+                const tipoTexto = data.tipo === "1" ? "LETIVO" : "NÃO LETIVO";
+                linha += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${data.nome}</td>
+                    <td>${formatarData(data.data)}</td>
+                    <td>${tipoTexto}</td>
+                    <td>${data.abrangencia}</td>
+                    <td align="center">
+                        <button data-id="${data.id}" class="btn btn-default"  onclick="abrir('modalEditarData'); Obter(this.dataset.id); setarDataId('btnEditarData', this.dataset.id)">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button data-id="${data.id}" class="btn btn-error" onclick="abrir('modalExcluirData'); setarDataId('btnExcluirData', this.dataset.id)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        } else {
+            linha = '<tr><td colspan="5" align="center">Nenhum registro encontrado.</td></tr>';
+        }
+        setarHTML('tabela_dados', linha);
+    }
+</script>
+{% endblock %}

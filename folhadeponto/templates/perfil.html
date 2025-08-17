@@ -1,0 +1,47 @@
+{% extends "master.html" %}
+
+{% block title %}
+Perfil
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    {% if user.is_authenticated %}
+    <h3 class="texto-centralizado w-100">{{ user.get_full_name|default:user.username }}</h3>
+    <p class="texto-centralizado">{{ user.email|default:'' }}</p>
+    {% else %}
+    <span class="texto-centralizado">Visitante</span>
+    {% endif %}
+    <p class="texto-centralizado">Servidor Público Federal - IFMA Campus Buriticupu</p>
+    <p class="texto-centralizado">Coordenadoria de Técnologia da Informação e Comunicação</p>
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-sm-12">
+                <label>Setores que coordena</label>
+                <table class="table tabela-customizada" id="tabela_carreiras">
+                    <thead>
+                        <tr align="left">
+                            <th>#</th>
+                            <th>Setor</th>
+                            <th>Nº Cargos</th>
+                            <th>Nº servidores</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela_dados">
+                        {% for setor in setores %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{ setor.nome }}</td>
+                            <td>{{ setor.num_cargos }}</td>
+                            <td>{{ setor.num_servidores }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

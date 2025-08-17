@@ -1,0 +1,377 @@
+{% extends "master.html" %}
+
+{% block title %}
+Setores
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-sm-5">
+      <label for="txtCargoServidor">Cargo</label>
+      <select class="w-100" id="txtCargoServidor">
+        <option value="0" selected disabled>---</option>
+        {% for cargo in cargos %}
+        <option value="{{ cargo.id }}">{{ cargo.nome }} ({{ cargo.area__nome }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-2">
+      <label for="txtSetorServidor">Setor</label>
+      <select class="w-100" id="txtSetorServidor">
+        <option value="0" selected disabled>---</option>
+        {% for setor in setores %}
+        <option value="{{ setor.id }}">{{ setor.sigla }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-5">
+      <label for="txtFuncaoServidor">Função</label>
+      <select class="w-100" id="txtFuncaoServidor">
+        <option value="" selected>--</option>
+        {% for funcao in funcoes %}
+        <option value="{{ funcao.id }}">{{ funcao.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-5">
+      <label for="txtNomeServidor">Nome</label>
+      <input type="text" class="form-control upper" id="txtNomeServidor">
+    </div>
+    <div class="col-sm-2">
+      <label for="txtMatriculaServidor">Matrícula</label>
+      <input type="number" class="form-control upper" id="txtMatriculaServidor">
+    </div>
+    <div class="col-sm-2">
+      <label for="txtDataExercicioServidor">Exercício</label>
+      <input type="date" class="form-control upper" id="txtDataExercicioServidor">
+    </div>
+    <div class="col-sm-1">
+      <label for="txtServidorEmPGD">Em PGD?</label>
+      <label class="switch item-centro mt-2">
+        <input type="checkbox" id="txtServidorEmPGD">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="col-sm-2 item-centro">
+      <button type="button" class="btn btn-default mt-4 form-control" onclick="Inserir()">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <label for="txtNomeServidorPesquisar">Listagem de Servidores</label>
+  <div class="row">
+    <div class="col-sm-10 item-direita">
+      <input type="text" class="form-control w-100" id="txtNomeServidorPesquisar"
+        placeholder="Informe o nome do servidor">
+    </div>
+
+    <div class="col-sm-2 item-centro">
+      <label for="txtServidorEmPGDPesquisar">Em PGD?</label>
+      <select class="w-100" id="txtServidorEmPGDPesquisar">
+        <option value="" selected>---</option>
+        <option value="0">NÃO</option>
+        <option value="1">SIM</option>
+      </select>
+    </div>
+
+
+    <div class="col-sm-3 item-direita">
+      <select class="w-100" id="txtCargoServidorPesquisar">
+        <option value="" selected>Cargo</option>
+        {% for cargo in cargos %}
+        <option value="{{ cargo.id }}">
+          <td>{{ cargo.nome | default:"-" }} ({{ cargo.area__nome | default:"-" }})</td>
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-sm-3 item-direita">
+      <select class="w-100" id="txtAreaCargoServidorPesquisar">
+        <option value="" selected>Área</option>
+        {% for area in areas %}
+        <option value="{{ area.id }}">
+          <td>{{ area.nome | default:"-" }}</td>
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-sm-2 item-direita">
+      <select class="w-100" id="txtSetorServidorPesquisar">
+        <option value="" selected>Setor</option>
+        {% for setor in setores %}
+        <option value="{{ setor.id }}">{{ setor.sigla }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-sm-2 item-direita">
+      <select class="w-100" id="txtFuncaoServidorPesquisar">
+        <option value="" selected>Função</option>
+        {% for funcao in funcoes %}
+        <option value="{{ funcao.id }}">{{ funcao.nome}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-1 item-centro">
+      <button class="btn btn-default form-control" onclick="Pesquisar()"><i class="fa fa-search"
+          aria-hidden="true"></i></button>
+    </div>
+    <div class="col-sm-1 item-centro">
+      <button class="btn btn-default form-control" onclick="location.reload()"><i class="fa fa-refresh"
+          aria-hidden="true"></i></button>
+    </div>
+    <div class="col-sm-12 table-responsive">
+      <table class="table tabela-customizada" id="tabela_Setors">
+        <thead>
+          <tr align="left">
+            <th>#</th>
+            <th>Nome</th>
+            <th>Matrícula</th>
+            <th>Cargo</th>
+            <th>Função</th>
+            <th>Setor</th>
+            <th>Exercício</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tabela_dados">
+
+          {% for servidor in servidores %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ servidor.nome }}</td>
+            <td>{{ servidor.matricula }}</td>
+            <td>{{ servidor.cargo__nome | default:"-" }} ({{ servidor.cargo__area__nome | default:"-" }})</td>
+            <td>{{ servidor.funcao__nome | default:"-" }}</td>
+            <td>{{ servidor.setor__sigla | default:"-"}}</td>
+            <td>{{ servidor.data_exercicio|date:"d/m/Y"}}</td>
+            <td align="center">
+              <button data-id="{{ servidor.id }}" class="btn btn-default"
+                onclick="abrir('modalEditarServidor'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+                <i class="fa fa-edit" aria-hidden="true"></i>
+              </button>
+              <button data-id="{{ servidor.id }}" class="btn btn-error"
+                onclick="abrir('modalExcluirServidor'); setarDataId('btnExcluir', this.dataset.id)">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="modalEditarServidor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Editar Servidor</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalEditarServidor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <label for="txtCargoServidorEditar">Cargo</label>
+    <select class="w-100" id="txtCargoServidorEditar">
+      <option value="0" selected disabled>---</option>
+      {% for cargo in cargos %}
+      <option value="{{ cargo.id }}">{{ cargo.nome }} ({{ cargo.area__nome }})</option>
+      {% endfor %}
+    </select>
+    <label for="txtSetorServidorEditar">Setor</label>
+    <select class="w-100" id="txtSetorServidorEditar">
+      <option value="0" selected disabled>---</option>
+      {% for setor in setores %}
+      <option value="{{ setor.id }}">{{ setor.sigla }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="txtFuncaoServidorEditar">Função</label>
+    <select class="w-100" id="txtFuncaoServidorEditar">
+      <option value="" selected>---</option>
+      {% for funcao in funcoes %}
+      <option value="{{ funcao.id }}">{{ funcao.nome }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="txtNomeServidorEditar">Nome</label>
+    <input type="text" class="form-control upper" id="txtNomeServidorEditar">
+    <div class="row">
+      <div class="col-sm-6">
+        <label for="txtMatriculaServidorEditar">Matrícula</label>
+        <input type="number" class="form-control upper" id="txtMatriculaServidorEditar">
+      </div>
+      <div class="col-sm-6">
+        <label for="txtDataExercicioServidorEditar">Exercício</label>
+        <input type="date" class="form-control upper" id="txtDataExercicioServidorEditar">
+      </div>
+      <div class="col-sm-12">
+        <label for="txtServidorEmPGDEditar">Em PGD?</label>
+        <select class="w-100" id="txtServidorEmPGDEditar">
+          <option value="" selected>---</option>
+          <option value="0">NÃO</option>
+          <option value="1">SIM</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalEditarServidor')">Cancelar</button>
+    <button class="btn btn-success" id="btnEditar" onclick="Editar(this.dataset.id)"><i class="fa fa-pencil-square-o"
+        aria-hidden="true"></i> Confirmar</button>
+  </div>
+</div>
+<div id="modalEditarServidorBackdrop" class="modal-backdrop"></div>
+
+<div id="modalExcluirServidor" class="modal" tabindex="-1">
+  <div class="modal-header">
+    <h2 id="modalTitulo" class="modal-title">Excluir Servidor</h2>
+    <button class="modal-close-btn" aria-label="Fechar Modal" id="fecharModalBtn"
+      onclick="fechar('modalExcluirServidor')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <p>Deseja realmente excluir?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default modal-fechar" onclick="fechar('modalExcluirServidor')">Cancelar</button>
+    <button class="btn btn-error" id="btnExcluir" onclick="Excluir(this.dataset.id)"><i class="fa fa-trash"></i>
+      Confirmar</button>
+  </div>
+</div>
+<div id="modalExcluirServidorBackdrop" class="modal-backdrop"></div>
+
+
+<script>
+  async function Inserir() {
+
+    const nomeServidor = obterElemento('txtNomeServidor');
+    const matriculaServidor = obterElemento('txtMatriculaServidor');
+    const dataExercicioServidor = obterElemento('txtDataExercicioServidor');
+    const idCargoServidor = obterElemento('txtCargoServidor');
+    const idSetorServidor = obterElemento('txtSetorServidor');
+    const idFuncaoServidor = obterElemento('txtFuncaoServidor');
+    const servidorEmPGD = obterElemento('txtServidorEmPGD')
+
+
+
+    const campos = [nomeServidor, matriculaServidor, dataExercicioServidor, idCargoServidor, idSetorServidor, servidorEmPGD];
+
+    if (algumCampoVazio(campos)) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const formData = new FormData()
+    formData.append('nome', nomeServidor.value.toUpperCase())
+    formData.append('matricula', matriculaServidor.value.toUpperCase());
+    formData.append('data_exercicio', dataExercicioServidor.value);
+    formData.append('cargo_id', idCargoServidor.value);
+    formData.append('setor_id', idSetorServidor.value);
+    formData.append('funcao_id', idFuncaoServidor.value);
+    formData.append('em_pgd', servidorEmPGD.checked ? 1 : 0);
+
+    const resposta = await InserirDados('/servidores/adicionar/', formData);
+  }
+  async function Obter(id_servidor) {
+    const resposta = await ObterDados(`/servidores/obter/${id_servidor}/`);
+    if (resposta.dados) {
+      setarValor('txtNomeServidorEditar', resposta.dados.nome);
+      setarValor('txtMatriculaServidorEditar', resposta.dados.matricula);
+      setarValor('txtDataExercicioServidorEditar', resposta.dados.data_exercicio);
+      setarValor('txtCargoServidorEditar', resposta.dados.cargo__id);
+      setarValor('txtServidorEmPGDEditar', resposta.dados.em_pgd ? 1 : 0);
+      if (resposta.dados.setor__id) {
+        setarValor('txtSetorServidorEditar', resposta.dados.setor__id);
+      }
+      if (resposta.dados.funcao__id) {
+        setarValor('txtFuncaoServidorEditar', resposta.dados.funcao__id);
+      }
+    }
+  }
+  async function Editar(id_servidor) {
+
+    const nomeServidor = obterElemento('txtNomeServidorEditar');
+    const matriculaServidor = obterElemento('txtMatriculaServidorEditar');
+    const dataExercicioServidor = obterElemento('txtDataExercicioServidorEditar');
+    const idCargoServidor = obterElemento('txtCargoServidorEditar');
+    const idSetorServidor = obterElemento('txtSetorServidorEditar');
+    const idFuncaoServidor = obterElemento('txtFuncaoServidorEditar');
+    const emPGD = obterElemento('txtServidorEmPGDEditar');
+
+    const campos = [nomeServidor, matriculaServidor, dataExercicioServidor, idCargoServidor, idSetorServidor, emPGD];
+
+    if (algumCampoVazio(campos)) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    const formData = new FormData()
+    formData.append('nome', nomeServidor.value.toUpperCase())
+    formData.append('matricula', matriculaServidor.value);
+    formData.append('data_exercicio', dataExercicioServidor.value);
+    formData.append('cargo_id', idCargoServidor.value);
+    formData.append('setor_id', idSetorServidor.value);
+    formData.append('funcao_id', idFuncaoServidor.value);
+    formData.append('em_pgd', emPGD.value);;
+
+    const resposta = await EditarDados(`/servidores/editar/${id_servidor}/`, formData);
+  }
+  async function Excluir(id_servidor) {
+    const resposta = await ExcluirDados(`/servidores/excluir/${id_servidor}/`);
+  }
+  async function Pesquisar() {
+
+    const txtNomeServidorPesquisar = obterElemento('txtNomeServidorPesquisar');
+    const txtCargoServidorPesquisar = obterElemento('txtCargoServidorPesquisar');
+    const txtSetorServidorPesquisar = obterElemento('txtSetorServidorPesquisar');
+    const txtFuncaoServidorPesquisar = obterElemento('txtFuncaoServidorPesquisar');
+    const txtAreaCargoServidorPesquisar = obterElemento('txtAreaCargoServidorPesquisar');
+    const txtServidorEmPGDPesquisar = obterElemento('txtServidorEmPGDPesquisar');
+
+    const nome = encodeURIComponent(txtNomeServidorPesquisar.value.trim());
+    const cargo = encodeURIComponent(txtCargoServidorPesquisar.value.trim());
+    const setor = encodeURIComponent(txtSetorServidorPesquisar.value.trim());
+    const funcao = encodeURIComponent(txtFuncaoServidorPesquisar.value.trim());
+    const area = encodeURIComponent(txtAreaCargoServidorPesquisar.value.trim());
+    const em_pgd = encodeURIComponent(txtServidorEmPGDPesquisar.value.trim());
+
+    const url = `/servidores/pesquisar/?nome=${nome}&idCargo=${cargo}&idSetor=${setor}&idFuncao=${funcao}&idArea=${area}&em_pgd=${em_pgd}`;
+
+    const resultado = await PesquisarDados(url);
+    let linha = '';
+
+    if (resultado.dados) {
+      resultado.dados.forEach((servidor, index) => {
+        linha += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${servidor.nome}</td>
+        <td>${servidor.matricula}</td>
+        <td>${servidor.cargo__nome || '-'} (${servidor.cargo__area__nome || '-'})</td>
+        <td>${servidor.funcao__nome || '-'}</td>
+        <td>${servidor.setor__sigla || '-'}</td>
+        <td>${formatarData(servidor.data_exercicio)}</td>
+        <td align="center">
+          <button data-id="${servidor.id}" class="btn btn-default"
+            onclick="abrir('modalEditarServidor'); Obter(this.dataset.id); setarDataId('btnEditar', this.dataset.id)">
+            <i class="fa fa-edit" aria-hidden="true"></i>
+          </button>
+          <button data-id="${servidor.id}" class="btn btn-error"
+            onclick="abrir('modalExcluirServidor'); setarDataId('btnExcluir', this.dataset.id)">
+            <i class="fa fa-trash" aria-hidden="true"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+      });
+    } else {
+      linha = '<tr><td colspan="8" align="center">Nenhum registro encontrado.</td></tr>';
+    }
+    setarHTML('tabela_dados', linha);
+  }
+</script>
+{% endblock %}

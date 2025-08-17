@@ -1,0 +1,146 @@
+{% extends "master.html" %}
+
+{% block title %}
+Folha de Ponto
+{% endblock %}
+
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4">
+      <label for="txtNivel">Nível do cargo</label>
+      <select class="w-100" id="txtNivel">
+        <option value="" selected>---</option>
+        <option value="ENSINO FUNDAMENTAL">ENSINO FUNDAMENTAL</option>
+        <option value="ENSINO MÉDIO">ENSINO MÉDIO</option>
+        <option value="ENSINO SUPERIOR">ENSINO SUPERIOR</option>
+      </select>
+    </div>
+    <div class="col-sm-4">
+      <label for="txtEmPGD">Em PGD?</label>
+      <select class="w-100" id="txtEmPGD">
+        <option value="" selected>---</option>
+        <option value="true">SIM</option>
+        <option value="false">NÃO</option>
+      </select>
+    </div>
+    <div class="col-sm-4">
+      <label>&nbsp;</label>
+      <button class="btn btn-default form-control" id="btnBuscar"
+        onclick="ServidoresPorCarreira();ServidoresPorCargo(); ServidoresPorSetor();">
+        <i class="fa fa-search" aria-hidden="true"></i> BUSCAR DADOS
+      </button>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row item-centro">
+    <div class="col-sm-4">
+      <label class="w-100 texto-centralizado">Servidores por Carreira</label>
+      <canvas id="GraficoServidoresPorCarreira" class="card-chart"></canvas>
+      
+    </div>
+    <div class="col-sm-4">
+      <label class="w-100 texto-centralizado">Servidores por Cargo</label>
+      <canvas id="GraficoServidoresPorCargo" class="card-chart"></canvas>
+      
+    </div>
+    <div class="col-sm-4">
+      <label class="w-100 texto-centralizado">Servidores por setor</label>
+      <canvas id="GraficoServidoresPorSetor" class="card-chart"></canvas>
+      
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    ServidoresPorSetor();
+    ServidoresPorCargo();
+    ServidoresPorCarreira();
+  })
+
+  async function ServidoresPorSetor() {
+
+    const nivel = obterElemento('txtNivel').value;
+    const pgd = obterElemento('txtEmPGD').value;
+    const url = `/setores/pesquisar/?nivel=${encodeURIComponent(nivel)}&pgd=${encodeURIComponent(pgd)}`;
+    const resposta = await PesquisarDados(url);
+
+    const eixoX = [];
+    const eixoY = [];
+
+
+    if (resposta.dados) {
+      resposta.dados.forEach(setor => {
+        if (setor.num_servidores > 0) {
+          eixoY.push(setor.num_servidores);
+          eixoX.push(setor.sigla);
+        }
+      });
+    }
+    PlotarGraficoDePizza('GraficoServidoresPorSetor', eixoX, eixoY);
+  }
+
+  async function ServidoresPorCargo() {
+
+    const nivel = obterElemento('txtNivel').value;
+    const pgd = obterElemento('txtEmPGD').value;
+    const url = `/cargos/pesquisar/?nivel=${encodeURIComponent(nivel)}&pgd=${encodeURIComponent(pgd)}`;
+    const resposta = await PesquisarDados(url);
+
+
+    const contagemCargos = {};
+
+    if (resposta?.dados?.length) {
+      resposta.dados.forEach(({ nome, num_servidores }) => {
+        if (num_servidores > 0) {
+          if (contagemCargos[nome]) {
+            contagemCargos[nome] += num_servidores;
+          } else {
+            contagemCargos[nome] = num_servidores;
+          }
+        }
+      });
+    }
+
+    const eixoX = Object.keys(contagemCargos);
+    const eixoY = Object.values(contagemCargos);
+
+    PlotarGraficoDePizza('GraficoServidoresPorCargo', eixoX, eixoY);
+  }
+
+  async function ServidoresPorCarreira() {
+
+    const nivel = obterElemento('txtNivel').value;
+    const pgd = obterElemento('txtEmPGD').value;
+    const url = `/carreiras/pesquisar/?nivel=${encodeURIComponent(nivel)}&pgd=${encodeURIComponent(pgd)}`;
+    const resposta = await PesquisarDados(url);
+
+    const eixoX = [];
+    const eixoY = [];
+
+
+    if (resposta.dados) {
+      resposta.dados.forEach(carreira => {
+        if (carreira.num_servidores > 0) {
+          eixoY.push(carreira.num_servidores);
+          eixoX.push(carreira.nome);
+        }
+      });
+    }
+
+    PlotarGraficoDePizza('GraficoServidoresPorCarreira', eixoX, eixoY);
+  }
+
+</script>
+
+{% endblock %}
